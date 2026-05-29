@@ -1,0 +1,157 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Media Time Guard – Person",
+        "description": "Create a media-time budget for one person. Bind to a person entity if available, otherwise just enter a name (e.g. for children without a person entity).",
+        "data": {
+          "name": "Name",
+          "person_entity": "Person entity (optional)",
+          "players": "Media players for this person"
+        }
+      },
+      "budgets": {
+        "title": "Daily budgets",
+        "description": "Minutes of media time per weekday. 0 means blocked on that day.",
+        "data": {
+          "budget_0": "Monday",
+          "budget_1": "Tuesday",
+          "budget_2": "Wednesday",
+          "budget_3": "Thursday",
+          "budget_4": "Friday",
+          "budget_5": "Saturday",
+          "budget_6": "Sunday"
+        }
+      },
+      "warning": {
+        "title": "Warning",
+        "description": "Optional one-time warning before the budget runs out. The TTS fields apply when method is TTS; the media fields apply when method is Media.",
+        "data": {
+          "warning_enabled": "Warning active",
+          "warning_threshold": "Remaining-time threshold (minutes)",
+          "warning_method": "Warning method",
+          "tts_entity": "TTS engine (entity)",
+          "tts_message": "Announcement text ({minutes} = remaining minutes)",
+          "warning_media_id": "Media content ID / URL",
+          "warning_media_type": "Media content type"
+        }
+      },
+      "reset": {
+        "title": "Reset",
+        "description": "Time of day at which the daily count is reset.",
+        "data": {
+          "reset_time": "Reset time"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "At least one selected media player is already assigned to another person.",
+      "no_players": "Select at least one media player.",
+      "tts_entity_required": "Choose a TTS engine when the warning method is TTS.",
+      "media_id_required": "Enter a media content ID when the warning method is Media."
+    },
+    "abort": {
+      "already_configured": "A person with this name is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Person & players",
+        "description": "Edit the name, optional person entity and the assigned media players.",
+        "data": {
+          "name": "Name",
+          "person_entity": "Person entity (optional)",
+          "players": "Media players for this person"
+        }
+      },
+      "budgets": {
+        "title": "Daily budgets",
+        "description": "Minutes of media time per weekday. 0 means blocked on that day.",
+        "data": {
+          "budget_0": "Monday",
+          "budget_1": "Tuesday",
+          "budget_2": "Wednesday",
+          "budget_3": "Thursday",
+          "budget_4": "Friday",
+          "budget_5": "Saturday",
+          "budget_6": "Sunday"
+        }
+      },
+      "warning": {
+        "title": "Warning",
+        "description": "Optional one-time warning before the budget runs out. The TTS fields apply when method is TTS; the media fields apply when method is Media.",
+        "data": {
+          "warning_enabled": "Warning active",
+          "warning_threshold": "Remaining-time threshold (minutes)",
+          "warning_method": "Warning method",
+          "tts_entity": "TTS engine (entity)",
+          "tts_message": "Announcement text ({minutes} = remaining minutes)",
+          "warning_media_id": "Media content ID / URL",
+          "warning_media_type": "Media content type"
+        }
+      },
+      "reset": {
+        "title": "Reset",
+        "description": "Time of day at which the daily count is reset.",
+        "data": {
+          "reset_time": "Reset time"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "At least one selected media player is already assigned to another person.",
+      "no_players": "Select at least one media player.",
+      "tts_entity_required": "Choose a TTS engine when the warning method is TTS.",
+      "media_id_required": "Enter a media content ID when the warning method is Media."
+    }
+  },
+  "selector": {
+    "warning_method": {
+      "options": {
+        "tts": "Text-to-speech announcement",
+        "media": "Play a media URL / content ID"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "name": "Extend time",
+      "description": "Add extra media minutes for today (raises the effective budget).",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (or slug) of the configured person."
+        },
+        "minutes": {
+          "name": "Minutes",
+          "description": "Number of extra minutes to add."
+        }
+      }
+    },
+    "suspend_today": {
+      "name": "Suspend today",
+      "description": "Suspend or resume enforcement for today (e.g. the child is ill).",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (or slug) of the configured person."
+        },
+        "suspended": {
+          "name": "Suspended",
+          "description": "True to suspend enforcement, false to resume."
+        }
+      }
+    },
+    "reset_person": {
+      "name": "Reset person",
+      "description": "Manually reset today's counters for a person.",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (or slug) of the configured person."
+        }
+      }
+    }
+  }
+}

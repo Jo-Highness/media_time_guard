@@ -1,0 +1,14 @@
+{
+  "domain": "media_time_guard",
+  "name": "Media Time Guard",
+  "version": "1.0.0",
+  "codeowners": ["@schmidtjohannes"],
+  "config_flow": true,
+  "documentation": "https://github.com/schmidtjohannes/media_time_guard",
+  "issue_tracker": "https://github.com/schmidtjohannes/media_time_guard/issues",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "after_dependencies": ["media_player", "tts"],
+  "dependencies": [],
+  "requirements": []
+}

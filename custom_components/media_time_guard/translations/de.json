@@ -1,0 +1,157 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Media Time Guard – Person",
+        "description": "Lege ein Medienzeit-Budget für eine Person an. Binde nach Möglichkeit eine Person-Entität ein, ansonsten gib einfach einen Namen ein (z. B. für Kinder ohne Person-Entität).",
+        "data": {
+          "name": "Name",
+          "person_entity": "Person-Entität (optional)",
+          "players": "Media-Player dieser Person"
+        }
+      },
+      "budgets": {
+        "title": "Tagesbudgets",
+        "description": "Minuten Medienzeit pro Wochentag. 0 bedeutet an diesem Tag gesperrt.",
+        "data": {
+          "budget_0": "Montag",
+          "budget_1": "Dienstag",
+          "budget_2": "Mittwoch",
+          "budget_3": "Donnerstag",
+          "budget_4": "Freitag",
+          "budget_5": "Samstag",
+          "budget_6": "Sonntag"
+        }
+      },
+      "warning": {
+        "title": "Warnung",
+        "description": "Optionale einmalige Warnung, bevor das Budget aufgebraucht ist. Die TTS-Felder gelten bei Methode TTS, die Medien-Felder bei Methode Medien.",
+        "data": {
+          "warning_enabled": "Warnung aktiv",
+          "warning_threshold": "Restzeit-Schwelle (Minuten)",
+          "warning_method": "Warnmethode",
+          "tts_entity": "TTS-Engine (Entität)",
+          "tts_message": "Ansagetext ({minutes} = Restminuten)",
+          "warning_media_id": "Medien-Content-ID / URL",
+          "warning_media_type": "Medien-Content-Typ"
+        }
+      },
+      "reset": {
+        "title": "Reset",
+        "description": "Uhrzeit, zu der die Tageszählung zurückgesetzt wird.",
+        "data": {
+          "reset_time": "Reset-Uhrzeit"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Mindestens einer der gewählten Media-Player ist bereits einer anderen Person zugeordnet.",
+      "no_players": "Wähle mindestens einen Media-Player.",
+      "tts_entity_required": "Wähle eine TTS-Engine, wenn die Warnmethode TTS ist.",
+      "media_id_required": "Gib eine Medien-Content-ID an, wenn die Warnmethode Medien ist."
+    },
+    "abort": {
+      "already_configured": "Eine Person mit diesem Namen ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Person & Player",
+        "description": "Bearbeite Namen, optionale Person-Entität und die zugeordneten Media-Player.",
+        "data": {
+          "name": "Name",
+          "person_entity": "Person-Entität (optional)",
+          "players": "Media-Player dieser Person"
+        }
+      },
+      "budgets": {
+        "title": "Tagesbudgets",
+        "description": "Minuten Medienzeit pro Wochentag. 0 bedeutet an diesem Tag gesperrt.",
+        "data": {
+          "budget_0": "Montag",
+          "budget_1": "Dienstag",
+          "budget_2": "Mittwoch",
+          "budget_3": "Donnerstag",
+          "budget_4": "Freitag",
+          "budget_5": "Samstag",
+          "budget_6": "Sonntag"
+        }
+      },
+      "warning": {
+        "title": "Warnung",
+        "description": "Optionale einmalige Warnung, bevor das Budget aufgebraucht ist. Die TTS-Felder gelten bei Methode TTS, die Medien-Felder bei Methode Medien.",
+        "data": {
+          "warning_enabled": "Warnung aktiv",
+          "warning_threshold": "Restzeit-Schwelle (Minuten)",
+          "warning_method": "Warnmethode",
+          "tts_entity": "TTS-Engine (Entität)",
+          "tts_message": "Ansagetext ({minutes} = Restminuten)",
+          "warning_media_id": "Medien-Content-ID / URL",
+          "warning_media_type": "Medien-Content-Typ"
+        }
+      },
+      "reset": {
+        "title": "Reset",
+        "description": "Uhrzeit, zu der die Tageszählung zurückgesetzt wird.",
+        "data": {
+          "reset_time": "Reset-Uhrzeit"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Mindestens einer der gewählten Media-Player ist bereits einer anderen Person zugeordnet.",
+      "no_players": "Wähle mindestens einen Media-Player.",
+      "tts_entity_required": "Wähle eine TTS-Engine, wenn die Warnmethode TTS ist.",
+      "media_id_required": "Gib eine Medien-Content-ID an, wenn die Warnmethode Medien ist."
+    }
+  },
+  "selector": {
+    "warning_method": {
+      "options": {
+        "tts": "Sprachansage (Text-to-Speech)",
+        "media": "Medien-URL / Content-ID abspielen"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "name": "Zeit verlängern",
+      "description": "Fügt für heute Extra-Minuten hinzu (erhöht das effektive Budget).",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (oder Slug) der konfigurierten Person."
+        },
+        "minutes": {
+          "name": "Minuten",
+          "description": "Anzahl der zusätzlichen Minuten."
+        }
+      }
+    },
+    "suspend_today": {
+      "name": "Heute aussetzen",
+      "description": "Setzt die Durchsetzung für heute aus oder aktiviert sie wieder (z. B. Kind ist krank).",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (oder Slug) der konfigurierten Person."
+        },
+        "suspended": {
+          "name": "Ausgesetzt",
+          "description": "True setzt die Durchsetzung aus, false aktiviert sie wieder."
+        }
+      }
+    },
+    "reset_person": {
+      "name": "Person zurücksetzen",
+      "description": "Setzt die heutigen Zähler einer Person manuell zurück.",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (oder Slug) der konfigurierten Person."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Media Time Guard – Personne",
+        "description": "Créez un budget de temps multimédia pour une personne. Liez une entité personne si possible, sinon saisissez simplement un nom (par ex. pour les enfants sans entité personne).",
+        "data": {
+          "name": "Nom",
+          "person_entity": "Entité personne (facultatif)",
+          "players": "Lecteurs multimédias de cette personne"
+        }
+      },
+      "budgets": {
+        "title": "Budgets quotidiens",
+        "description": "Minutes de temps multimédia par jour de la semaine. 0 signifie bloqué ce jour-là.",
+        "data": {
+          "budget_0": "Lundi",
+          "budget_1": "Mardi",
+          "budget_2": "Mercredi",
+          "budget_3": "Jeudi",
+          "budget_4": "Vendredi",
+          "budget_5": "Samedi",
+          "budget_6": "Dimanche"
+        }
+      },
+      "warning": {
+        "title": "Avertissement",
+        "description": "Avertissement unique facultatif avant l'épuisement du budget. Les champs TTS s'appliquent avec la méthode TTS ; les champs multimédias avec la méthode Multimédia.",
+        "data": {
+          "warning_enabled": "Avertissement actif",
+          "warning_threshold": "Seuil de temps restant (minutes)",
+          "warning_method": "Méthode d'avertissement",
+          "tts_entity": "Moteur TTS (entité)",
+          "tts_message": "Texte de l'annonce ({minutes} = minutes restantes)",
+          "warning_media_id": "ID de contenu multimédia / URL",
+          "warning_media_type": "Type de contenu multimédia"
+        }
+      },
+      "reset": {
+        "title": "Réinitialisation",
+        "description": "Heure à laquelle le compteur quotidien est réinitialisé.",
+        "data": {
+          "reset_time": "Heure de réinitialisation"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Au moins un des lecteurs sélectionnés est déjà attribué à une autre personne.",
+      "no_players": "Sélectionnez au moins un lecteur multimédia.",
+      "tts_entity_required": "Choisissez un moteur TTS lorsque la méthode d'avertissement est TTS.",
+      "media_id_required": "Saisissez un ID de contenu multimédia lorsque la méthode d'avertissement est Multimédia."
+    },
+    "abort": {
+      "already_configured": "Une personne portant ce nom est déjà configurée."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Personne et lecteurs",
+        "description": "Modifiez le nom, l'entité personne facultative et les lecteurs attribués.",
+        "data": {
+          "name": "Nom",
+          "person_entity": "Entité personne (facultatif)",
+          "players": "Lecteurs multimédias de cette personne"
+        }
+      },
+      "budgets": {
+        "title": "Budgets quotidiens",
+        "description": "Minutes de temps multimédia par jour de la semaine. 0 signifie bloqué ce jour-là.",
+        "data": {
+          "budget_0": "Lundi",
+          "budget_1": "Mardi",
+          "budget_2": "Mercredi",
+          "budget_3": "Jeudi",
+          "budget_4": "Vendredi",
+          "budget_5": "Samedi",
+          "budget_6": "Dimanche"
+        }
+      },
+      "warning": {
+        "title": "Avertissement",
+        "description": "Avertissement unique facultatif avant l'épuisement du budget. Les champs TTS s'appliquent avec la méthode TTS ; les champs multimédias avec la méthode Multimédia.",
+        "data": {
+          "warning_enabled": "Avertissement actif",
+          "warning_threshold": "Seuil de temps restant (minutes)",
+          "warning_method": "Méthode d'avertissement",
+          "tts_entity": "Moteur TTS (entité)",
+          "tts_message": "Texte de l'annonce ({minutes} = minutes restantes)",
+          "warning_media_id": "ID de contenu multimédia / URL",
+          "warning_media_type": "Type de contenu multimédia"
+        }
+      },
+      "reset": {
+        "title": "Réinitialisation",
+        "description": "Heure à laquelle le compteur quotidien est réinitialisé.",
+        "data": {
+          "reset_time": "Heure de réinitialisation"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Au moins un des lecteurs sélectionnés est déjà attribué à une autre personne.",
+      "no_players": "Sélectionnez au moins un lecteur multimédia.",
+      "tts_entity_required": "Choisissez un moteur TTS lorsque la méthode d'avertissement est TTS.",
+      "media_id_required": "Saisissez un ID de contenu multimédia lorsque la méthode d'avertissement est Multimédia."
+    }
+  },
+  "selector": {
+    "warning_method": {
+      "options": {
+        "tts": "Annonce vocale (synthèse vocale)",
+        "media": "Lire une URL / un ID de contenu multimédia"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "name": "Prolonger le temps",
+      "description": "Ajoute des minutes supplémentaires pour aujourd'hui (augmente le budget effectif).",
+      "fields": {
+        "person": {
+          "name": "Personne",
+          "description": "Nom (ou slug) de la personne configurée."
+        },
+        "minutes": {
+          "name": "Minutes",
+          "description": "Nombre de minutes supplémentaires à ajouter."
+        }
+      }
+    },
+    "suspend_today": {
+      "name": "Suspendre aujourd'hui",
+      "description": "Suspend ou reprend l'application pour aujourd'hui (par ex. l'enfant est malade).",
+      "fields": {
+        "person": {
+          "name": "Personne",
+          "description": "Nom (ou slug) de la personne configurée."
+        },
+        "suspended": {
+          "name": "Suspendu",
+          "description": "True pour suspendre l'application, false pour la reprendre."
+        }
+      }
+    },
+    "reset_person": {
+      "name": "Réinitialiser la personne",
+      "description": "Réinitialise manuellement les compteurs du jour pour une personne.",
+      "fields": {
+        "person": {
+          "name": "Personne",
+          "description": "Nom (ou slug) de la personne configurée."
+        }
+      }
+    }
+  }
+}

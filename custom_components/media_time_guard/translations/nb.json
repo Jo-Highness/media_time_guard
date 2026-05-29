@@ -1,0 +1,157 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Media Time Guard – Person",
+        "description": "Opprett et mediebudsjett for én person. Knytt til en person-entitet hvis mulig, ellers skriv bare inn et navn (f.eks. for barn uten person-entitet).",
+        "data": {
+          "name": "Navn",
+          "person_entity": "Person-entitet (valgfritt)",
+          "players": "Mediespillere for denne personen"
+        }
+      },
+      "budgets": {
+        "title": "Daglige budsjetter",
+        "description": "Minutter med medietid per ukedag. 0 betyr sperret den dagen.",
+        "data": {
+          "budget_0": "Mandag",
+          "budget_1": "Tirsdag",
+          "budget_2": "Onsdag",
+          "budget_3": "Torsdag",
+          "budget_4": "Fredag",
+          "budget_5": "Lørdag",
+          "budget_6": "Søndag"
+        }
+      },
+      "warning": {
+        "title": "Advarsel",
+        "description": "Valgfri engangsadvarsel før budsjettet er brukt opp. TTS-feltene gjelder ved metoden TTS; mediefeltene ved metoden Media.",
+        "data": {
+          "warning_enabled": "Advarsel aktiv",
+          "warning_threshold": "Terskel for gjenværende tid (minutter)",
+          "warning_method": "Advarselsmetode",
+          "tts_entity": "TTS-motor (entitet)",
+          "tts_message": "Annonseringstekst ({minutes} = gjenværende minutter)",
+          "warning_media_id": "Medieinnholds-ID / URL",
+          "warning_media_type": "Medieinnholdstype"
+        }
+      },
+      "reset": {
+        "title": "Nullstilling",
+        "description": "Tidspunktet på dagen da den daglige tellingen nullstilles.",
+        "data": {
+          "reset_time": "Nullstillingstidspunkt"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Minst én valgt mediespiller er allerede tildelt en annen person.",
+      "no_players": "Velg minst én mediespiller.",
+      "tts_entity_required": "Velg en TTS-motor når advarselsmetoden er TTS.",
+      "media_id_required": "Skriv inn en medieinnholds-ID når advarselsmetoden er Media."
+    },
+    "abort": {
+      "already_configured": "En person med dette navnet er allerede konfigurert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Person og spillere",
+        "description": "Rediger navn, valgfri person-entitet og tilordnede mediespillere.",
+        "data": {
+          "name": "Navn",
+          "person_entity": "Person-entitet (valgfritt)",
+          "players": "Mediespillere for denne personen"
+        }
+      },
+      "budgets": {
+        "title": "Daglige budsjetter",
+        "description": "Minutter med medietid per ukedag. 0 betyr sperret den dagen.",
+        "data": {
+          "budget_0": "Mandag",
+          "budget_1": "Tirsdag",
+          "budget_2": "Onsdag",
+          "budget_3": "Torsdag",
+          "budget_4": "Fredag",
+          "budget_5": "Lørdag",
+          "budget_6": "Søndag"
+        }
+      },
+      "warning": {
+        "title": "Advarsel",
+        "description": "Valgfri engangsadvarsel før budsjettet er brukt opp. TTS-feltene gjelder ved metoden TTS; mediefeltene ved metoden Media.",
+        "data": {
+          "warning_enabled": "Advarsel aktiv",
+          "warning_threshold": "Terskel for gjenværende tid (minutter)",
+          "warning_method": "Advarselsmetode",
+          "tts_entity": "TTS-motor (entitet)",
+          "tts_message": "Annonseringstekst ({minutes} = gjenværende minutter)",
+          "warning_media_id": "Medieinnholds-ID / URL",
+          "warning_media_type": "Medieinnholdstype"
+        }
+      },
+      "reset": {
+        "title": "Nullstilling",
+        "description": "Tidspunktet på dagen da den daglige tellingen nullstilles.",
+        "data": {
+          "reset_time": "Nullstillingstidspunkt"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Minst én valgt mediespiller er allerede tildelt en annen person.",
+      "no_players": "Velg minst én mediespiller.",
+      "tts_entity_required": "Velg en TTS-motor når advarselsmetoden er TTS.",
+      "media_id_required": "Skriv inn en medieinnholds-ID når advarselsmetoden er Media."
+    }
+  },
+  "selector": {
+    "warning_method": {
+      "options": {
+        "tts": "Taleannonsering (tekst-til-tale)",
+        "media": "Spill av en medie-URL / innholds-ID"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "name": "Forleng tid",
+      "description": "Legg til ekstra medieminutter for i dag (øker det effektive budsjettet).",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Navn (eller slug) på den konfigurerte personen."
+        },
+        "minutes": {
+          "name": "Minutter",
+          "description": "Antall ekstra minutter som skal legges til."
+        }
+      }
+    },
+    "suspend_today": {
+      "name": "Sett på pause i dag",
+      "description": "Sett håndhevingen på pause eller gjenoppta den for i dag (f.eks. barnet er sykt).",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Navn (eller slug) på den konfigurerte personen."
+        },
+        "suspended": {
+          "name": "På pause",
+          "description": "True for å sette håndhevingen på pause, false for å gjenoppta."
+        }
+      }
+    },
+    "reset_person": {
+      "name": "Nullstill person",
+      "description": "Nullstill dagens tellere for en person manuelt.",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Navn (eller slug) på den konfigurerte personen."
+        }
+      }
+    }
+  }
+}

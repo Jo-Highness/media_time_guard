@@ -1,0 +1,157 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Media Time Guard – Persona",
+        "description": "Crea un presupuesto de tiempo multimedia para una persona. Vincula una entidad de persona si es posible; si no, introduce solo un nombre (p. ej. para niños sin entidad de persona).",
+        "data": {
+          "name": "Nombre",
+          "person_entity": "Entidad de persona (opcional)",
+          "players": "Reproductores multimedia de esta persona"
+        }
+      },
+      "budgets": {
+        "title": "Presupuestos diarios",
+        "description": "Minutos de tiempo multimedia por día de la semana. 0 significa bloqueado ese día.",
+        "data": {
+          "budget_0": "Lunes",
+          "budget_1": "Martes",
+          "budget_2": "Miércoles",
+          "budget_3": "Jueves",
+          "budget_4": "Viernes",
+          "budget_5": "Sábado",
+          "budget_6": "Domingo"
+        }
+      },
+      "warning": {
+        "title": "Aviso",
+        "description": "Aviso único opcional antes de agotar el presupuesto. Los campos TTS se aplican con el método TTS; los campos multimedia con el método Multimedia.",
+        "data": {
+          "warning_enabled": "Aviso activo",
+          "warning_threshold": "Umbral de tiempo restante (minutos)",
+          "warning_method": "Método de aviso",
+          "tts_entity": "Motor TTS (entidad)",
+          "tts_message": "Texto del anuncio ({minutes} = minutos restantes)",
+          "warning_media_id": "ID de contenido multimedia / URL",
+          "warning_media_type": "Tipo de contenido multimedia"
+        }
+      },
+      "reset": {
+        "title": "Reinicio",
+        "description": "Hora del día a la que se reinicia el recuento diario.",
+        "data": {
+          "reset_time": "Hora de reinicio"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Al menos uno de los reproductores seleccionados ya está asignado a otra persona.",
+      "no_players": "Selecciona al menos un reproductor multimedia.",
+      "tts_entity_required": "Elige un motor TTS cuando el método de aviso sea TTS.",
+      "media_id_required": "Introduce un ID de contenido multimedia cuando el método de aviso sea Multimedia."
+    },
+    "abort": {
+      "already_configured": "Ya existe una persona configurada con este nombre."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Persona y reproductores",
+        "description": "Edita el nombre, la entidad de persona opcional y los reproductores asignados.",
+        "data": {
+          "name": "Nombre",
+          "person_entity": "Entidad de persona (opcional)",
+          "players": "Reproductores multimedia de esta persona"
+        }
+      },
+      "budgets": {
+        "title": "Presupuestos diarios",
+        "description": "Minutos de tiempo multimedia por día de la semana. 0 significa bloqueado ese día.",
+        "data": {
+          "budget_0": "Lunes",
+          "budget_1": "Martes",
+          "budget_2": "Miércoles",
+          "budget_3": "Jueves",
+          "budget_4": "Viernes",
+          "budget_5": "Sábado",
+          "budget_6": "Domingo"
+        }
+      },
+      "warning": {
+        "title": "Aviso",
+        "description": "Aviso único opcional antes de agotar el presupuesto. Los campos TTS se aplican con el método TTS; los campos multimedia con el método Multimedia.",
+        "data": {
+          "warning_enabled": "Aviso activo",
+          "warning_threshold": "Umbral de tiempo restante (minutos)",
+          "warning_method": "Método de aviso",
+          "tts_entity": "Motor TTS (entidad)",
+          "tts_message": "Texto del anuncio ({minutes} = minutos restantes)",
+          "warning_media_id": "ID de contenido multimedia / URL",
+          "warning_media_type": "Tipo de contenido multimedia"
+        }
+      },
+      "reset": {
+        "title": "Reinicio",
+        "description": "Hora del día a la que se reinicia el recuento diario.",
+        "data": {
+          "reset_time": "Hora de reinicio"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "Al menos uno de los reproductores seleccionados ya está asignado a otra persona.",
+      "no_players": "Selecciona al menos un reproductor multimedia.",
+      "tts_entity_required": "Elige un motor TTS cuando el método de aviso sea TTS.",
+      "media_id_required": "Introduce un ID de contenido multimedia cuando el método de aviso sea Multimedia."
+    }
+  },
+  "selector": {
+    "warning_method": {
+      "options": {
+        "tts": "Anuncio de voz (texto a voz)",
+        "media": "Reproducir una URL / ID de contenido multimedia"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "name": "Ampliar tiempo",
+      "description": "Añade minutos extra para hoy (aumenta el presupuesto efectivo).",
+      "fields": {
+        "person": {
+          "name": "Persona",
+          "description": "Nombre (o slug) de la persona configurada."
+        },
+        "minutes": {
+          "name": "Minutos",
+          "description": "Número de minutos extra a añadir."
+        }
+      }
+    },
+    "suspend_today": {
+      "name": "Suspender hoy",
+      "description": "Suspende o reanuda la aplicación para hoy (p. ej. el niño está enfermo).",
+      "fields": {
+        "person": {
+          "name": "Persona",
+          "description": "Nombre (o slug) de la persona configurada."
+        },
+        "suspended": {
+          "name": "Suspendido",
+          "description": "True para suspender la aplicación, false para reanudarla."
+        }
+      }
+    },
+    "reset_person": {
+      "name": "Reiniciar persona",
+      "description": "Reinicia manualmente los contadores de hoy de una persona.",
+      "fields": {
+        "person": {
+          "name": "Persona",
+          "description": "Nombre (o slug) de la persona configurada."
+        }
+      }
+    }
+  }
+}

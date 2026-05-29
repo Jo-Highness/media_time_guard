@@ -1,0 +1,54 @@
+extend_time:
+  name: Extend time
+  description: Add extra media minutes for today (raises the effective budget).
+  fields:
+    person:
+      name: Person
+      description: Name (or slug) of the configured person.
+      required: true
+      example: Luke
+      selector:
+        text:
+    minutes:
+      name: Minutes
+      description: Number of extra minutes to add.
+      required: true
+      example: 15
+      selector:
+        number:
+          min: 1
+          max: 600
+          step: 1
+          unit_of_measurement: min
+          mode: box
+
+suspend_today:
+  name: Suspend today
+  description: Suspend or resume enforcement for today (e.g. the child is ill).
+  fields:
+    person:
+      name: Person
+      description: Name (or slug) of the configured person.
+      required: true
+      example: Luke
+      selector:
+        text:
+    suspended:
+      name: Suspended
+      description: True to suspend enforcement, false to resume.
+      required: true
+      example: true
+      selector:
+        boolean:
+
+reset_person:
+  name: Reset person
+  description: Manually reset today's counters for a person.
+  fields:
+    person:
+      name: Person
+      description: Name (or slug) of the configured person.
+      required: true
+      example: Luke
+      selector:
+        text:

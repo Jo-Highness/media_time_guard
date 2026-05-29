@@ -1,0 +1,157 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Media Time Guard – 人物",
+        "description": "1人分のメディア時間予算を作成します。可能であれば person エンティティに紐付け、なければ名前を入力してください（例: person エンティティのない子供）。",
+        "data": {
+          "name": "名前",
+          "person_entity": "person エンティティ（任意）",
+          "players": "この人物のメディアプレーヤー"
+        }
+      },
+      "budgets": {
+        "title": "1日の予算",
+        "description": "曜日ごとのメディア時間（分）。0 はその日を禁止することを意味します。",
+        "data": {
+          "budget_0": "月曜日",
+          "budget_1": "火曜日",
+          "budget_2": "水曜日",
+          "budget_3": "木曜日",
+          "budget_4": "金曜日",
+          "budget_5": "土曜日",
+          "budget_6": "日曜日"
+        }
+      },
+      "warning": {
+        "title": "警告",
+        "description": "予算が尽きる前の任意の1回限りの警告。TTS フィールドは方式が TTS の場合、メディアフィールドは方式がメディアの場合に適用されます。",
+        "data": {
+          "warning_enabled": "警告を有効化",
+          "warning_threshold": "残り時間のしきい値（分）",
+          "warning_method": "警告方式",
+          "tts_entity": "TTS エンジン（エンティティ）",
+          "tts_message": "アナウンス文（{minutes} = 残り分数）",
+          "warning_media_id": "メディアコンテンツID / URL",
+          "warning_media_type": "メディアコンテンツ種別"
+        }
+      },
+      "reset": {
+        "title": "リセット",
+        "description": "1日のカウントをリセットする時刻。",
+        "data": {
+          "reset_time": "リセット時刻"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "選択したメディアプレーヤーの少なくとも1つは、すでに別の人物に割り当てられています。",
+      "no_players": "メディアプレーヤーを少なくとも1つ選択してください。",
+      "tts_entity_required": "警告方式が TTS の場合は TTS エンジンを選択してください。",
+      "media_id_required": "警告方式がメディアの場合はメディアコンテンツIDを入力してください。"
+    },
+    "abort": {
+      "already_configured": "この名前の人物はすでに設定されています。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "人物とプレーヤー",
+        "description": "名前、任意の person エンティティ、割り当てるメディアプレーヤーを編集します。",
+        "data": {
+          "name": "名前",
+          "person_entity": "person エンティティ（任意）",
+          "players": "この人物のメディアプレーヤー"
+        }
+      },
+      "budgets": {
+        "title": "1日の予算",
+        "description": "曜日ごとのメディア時間（分）。0 はその日を禁止することを意味します。",
+        "data": {
+          "budget_0": "月曜日",
+          "budget_1": "火曜日",
+          "budget_2": "水曜日",
+          "budget_3": "木曜日",
+          "budget_4": "金曜日",
+          "budget_5": "土曜日",
+          "budget_6": "日曜日"
+        }
+      },
+      "warning": {
+        "title": "警告",
+        "description": "予算が尽きる前の任意の1回限りの警告。TTS フィールドは方式が TTS の場合、メディアフィールドは方式がメディアの場合に適用されます。",
+        "data": {
+          "warning_enabled": "警告を有効化",
+          "warning_threshold": "残り時間のしきい値（分）",
+          "warning_method": "警告方式",
+          "tts_entity": "TTS エンジン（エンティティ）",
+          "tts_message": "アナウンス文（{minutes} = 残り分数）",
+          "warning_media_id": "メディアコンテンツID / URL",
+          "warning_media_type": "メディアコンテンツ種別"
+        }
+      },
+      "reset": {
+        "title": "リセット",
+        "description": "1日のカウントをリセットする時刻。",
+        "data": {
+          "reset_time": "リセット時刻"
+        }
+      }
+    },
+    "error": {
+      "player_in_use": "選択したメディアプレーヤーの少なくとも1つは、すでに別の人物に割り当てられています。",
+      "no_players": "メディアプレーヤーを少なくとも1つ選択してください。",
+      "tts_entity_required": "警告方式が TTS の場合は TTS エンジンを選択してください。",
+      "media_id_required": "警告方式がメディアの場合はメディアコンテンツIDを入力してください。"
+    }
+  },
+  "selector": {
+    "warning_method": {
+      "options": {
+        "tts": "音声アナウンス（テキスト読み上げ）",
+        "media": "メディアURL / コンテンツIDを再生"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "name": "時間を延長",
+      "description": "今日の追加メディア分を加算します（実効予算を増やします）。",
+      "fields": {
+        "person": {
+          "name": "人物",
+          "description": "設定済みの人物の名前（またはスラッグ）。"
+        },
+        "minutes": {
+          "name": "分",
+          "description": "追加する分数。"
+        }
+      }
+    },
+    "suspend_today": {
+      "name": "今日は一時停止",
+      "description": "今日の強制を一時停止または再開します（例: 子供が病気）。",
+      "fields": {
+        "person": {
+          "name": "人物",
+          "description": "設定済みの人物の名前（またはスラッグ）。"
+        },
+        "suspended": {
+          "name": "一時停止",
+          "description": "True で強制を一時停止、false で再開。"
+        }
+      }
+    },
+    "reset_person": {
+      "name": "人物をリセット",
+      "description": "人物の今日のカウンターを手動でリセットします。",
+      "fields": {
+        "person": {
+          "name": "人物",
+          "description": "設定済みの人物の名前（またはスラッグ）。"
+        }
+      }
+    }
+  }
+}
