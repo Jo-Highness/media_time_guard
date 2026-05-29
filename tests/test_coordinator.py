@@ -147,9 +147,7 @@ async def test_persistence_restore_same_day(hass):
     entry.add_to_hass(hass)
     key = f"{STORAGE_KEY_PREFIX}{entry.entry_id}"
     with freeze_time("2026-05-29 12:00:00"):
-        hass.data.setdefault("hass_storage", {})
         # Inject persisted state for "today".
-        hass.config.set_time_zone("UTC")
         from homeassistant.helpers.storage import Store
 
         store = Store(hass, STORAGE_VERSION, key)

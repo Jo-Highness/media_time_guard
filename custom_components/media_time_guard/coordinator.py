@@ -110,6 +110,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         super().__init__(
             hass,
             _LOGGER,
+            config_entry=entry,
             name=f"{DOMAIN} {name}",
             update_interval=POLL_INTERVAL,
         )
