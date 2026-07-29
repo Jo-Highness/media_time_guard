@@ -153,5 +153,27 @@
         }
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "remaining": {
+        "name": "Temps restant"
+      }
+    },
+    "switch": {
+      "suspend_today": {
+        "name": "Suspendre aujourd'hui"
+      }
+    },
+    "number": {
+      "extra_minutes": {
+        "name": "Minutes supplémentaires"
+      }
+    },
+    "button": {
+      "extend": {
+        "name": "+{minutes} min"
+      }
+    }
   }
 }

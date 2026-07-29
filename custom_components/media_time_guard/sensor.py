@@ -49,7 +49,7 @@ class RemainingSensor(MediaTimeGuardEntity, SensorEntity):
 
     def __init__(self, coordinator: PersonGuard) -> None:
         super().__init__(coordinator, "remaining")
-        self._attr_name = f"Media Time {coordinator.person_name} Remaining"
+        self._attr_translation_key = "remaining"
         self.entity_id = f"sensor.media_time_{coordinator.slug}_remaining"
 
     @property

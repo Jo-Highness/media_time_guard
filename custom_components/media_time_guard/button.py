@@ -30,7 +30,8 @@ class ExtendButton(MediaTimeGuardEntity, ButtonEntity):
     def __init__(self, coordinator: PersonGuard, minutes: int) -> None:
         super().__init__(coordinator, f"extend_{minutes}")
         self._minutes = minutes
-        self._attr_name = f"Media Time {coordinator.person_name} +{minutes} min"
+        self._attr_translation_key = "extend"
+        self._attr_translation_placeholders = {"minutes": str(minutes)}
         self.entity_id = f"button.media_time_{coordinator.slug}_extend_{minutes}"
 
     async def async_press(self) -> None:

@@ -41,7 +41,7 @@ class ExtendNumber(MediaTimeGuardEntity, NumberEntity):
 
     def __init__(self, coordinator: PersonGuard) -> None:
         super().__init__(coordinator, "extend")
-        self._attr_name = f"Media Time {coordinator.person_name} Extra Minutes"
+        self._attr_translation_key = "extra_minutes"
         self.entity_id = f"number.media_time_{coordinator.slug}_extend"
 
     @property

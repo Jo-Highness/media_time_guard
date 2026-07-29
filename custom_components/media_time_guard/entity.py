@@ -12,7 +12,7 @@ from .coordinator import PersonGuard
 class MediaTimeGuardEntity(CoordinatorEntity[PersonGuard]):
     """Base class wiring entities to a person's :class:`PersonGuard`."""
 
-    _attr_has_entity_name = False
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator: PersonGuard, key: str) -> None:
         super().__init__(coordinator)
