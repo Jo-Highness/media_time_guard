@@ -7,5 +7,17 @@ __pycache__/
 venv/
 .coverage
 htmlcov/
+.ruff_cache/
 
 run_tests.sh
+
+# Home Assistant runtime
+.storage/
+
+# Editor / OS artefacts
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
