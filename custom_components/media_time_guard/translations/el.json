@@ -153,5 +153,27 @@
         }
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "remaining": {
+        "name": "Υπόλοιπος χρόνος"
+      }
+    },
+    "switch": {
+      "suspend_today": {
+        "name": "Αναστολή σήμερα"
+      }
+    },
+    "number": {
+      "extra_minutes": {
+        "name": "Επιπλέον λεπτά"
+      }
+    },
+    "button": {
+      "extend": {
+        "name": "+{minutes} λεπτά"
+      }
+    }
   }
 }

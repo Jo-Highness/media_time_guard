@@ -153,5 +153,27 @@
         }
       }
     }
+  },
+  "entity": {
+    "sensor": {
+      "remaining": {
+        "name": "残り時間"
+      }
+    },
+    "switch": {
+      "suspend_today": {
+        "name": "今日は一時停止"
+      }
+    },
+    "number": {
+      "extra_minutes": {
+        "name": "追加の分"
+      }
+    },
+    "button": {
+      "extend": {
+        "name": "+{minutes}分"
+      }
+    }
   }
 }
