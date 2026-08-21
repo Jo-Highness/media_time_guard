@@ -1,0 +1,78 @@
+name: Bug report
+description: Report a problem with Media Time Guard
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Please fill in as much
+        detail as you can — it makes fixing the issue much faster.
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      description: "Settings → About (e.g. 2026.2.0)"
+      placeholder: "2026.2.0"
+    validations:
+      required: true
+  - type: input
+    id: integration_version
+    attributes:
+      label: Media Time Guard version
+      description: "The version installed via HACS (e.g. 1.1.0)"
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: People and players setup
+      description: >-
+        How many people (children) are configured, and which media_player
+        entities are assigned to them? Mention if players are grouped.
+      placeholder: |
+        - Person "Emma": media_player.sonos_kids_room, media_player.sonos_kitchen
+        - Person "Max": media_player.sonos_max_room
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened? Include steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: >-
+        Enable debug logging by adding the following to configuration.yaml,
+        restart Home Assistant, reproduce the issue, then paste the relevant log
+        lines here.
+      value: |
+        logger:
+          default: warning
+          logs:
+            custom_components.media_time_guard: debug
+      render: shell
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I am running the latest version of Media Time Guard.
+          required: true
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
+        - label: I have included debug logs (or explained why I could not).
+          required: false

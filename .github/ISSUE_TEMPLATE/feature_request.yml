@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest an idea or improvement for Media Time Guard
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe your idea below.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: >-
+        What problem would this feature solve? Is your request related to a
+        frustration ("I'm always frustrated when…")?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe what you would like to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or workarounds you have considered.
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: >-
+        Anything else — mockups, related integrations, your household setup, etc.
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and did not find a similar request.
+          required: true
