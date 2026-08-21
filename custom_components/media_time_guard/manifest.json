@@ -1,14 +1,19 @@
 {
   "domain": "media_time_guard",
   "name": "Media Time Guard",
-  "version": "1.1.0",
-  "codeowners": ["@Jo-Highness"],
+  "after_dependencies": [
+    "media_player",
+    "tts"
+  ],
+  "codeowners": [
+    "@Jo-Highness"
+  ],
   "config_flow": true,
+  "dependencies": [],
   "documentation": "https://github.com/Jo-Highness/media_time_guard",
-  "issue_tracker": "https://github.com/Jo-Highness/media_time_guard/issues",
   "integration_type": "service",
   "iot_class": "calculated",
-  "after_dependencies": ["media_player", "tts"],
-  "dependencies": [],
-  "requirements": []
+  "issue_tracker": "https://github.com/Jo-Highness/media_time_guard/issues",
+  "requirements": [],
+  "version": "1.1.0"
 }
