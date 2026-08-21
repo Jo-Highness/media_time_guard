@@ -40,6 +40,14 @@ One config entry per child: bind it to a `person` entity (or simply enter a name
 that person's `media_player` entities. The integration counts media time on those players
 and, once the day's budget is used up, keeps the assigned players stopped.
 
+## Screenshots
+
+> Captured from a demo Home Assistant with fictional data.
+
+| Setup (config flow) | Entities card in use |
+|:---:|:---:|
+| ![The UI setup form](images/config-flow.png) | ![Remaining time, extra minutes, suspend and quick-add buttons](images/dashboard.png) |
+
 ## Installation
 
 ### HACS (recommended)
