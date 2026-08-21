@@ -22,8 +22,8 @@ between events, the poll and the reset.
 from __future__ import annotations
 
 import asyncio
-import logging
 from datetime import date, datetime, time, timedelta
+import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID
@@ -114,9 +114,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             name=f"{DOMAIN} {name}",
             update_interval=POLL_INTERVAL,
         )
-        self._store: Store = Store(
-            hass, STORAGE_VERSION, f"{STORAGE_KEY_PREFIX}{entry.entry_id}"
-        )
+        self._store: Store = Store(hass, STORAGE_VERSION, f"{STORAGE_KEY_PREFIX}{entry.entry_id}")
         self._lock = asyncio.Lock()
         self._unsubs: list = []
 
@@ -189,9 +187,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
 
         # React to player state changes (instant enforcement).
         self._unsubs.append(
-            async_track_state_change_event(
-                self.hass, self.players, self._handle_state_event
-            )
+            async_track_state_change_event(self.hass, self.players, self._handle_state_event)
         )
         # Precise daily reset.
         reset = self.reset_time
@@ -243,9 +239,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             return
 
         stored_date_raw = stored.get("media_date")
-        stored_date = (
-            date.fromisoformat(stored_date_raw) if stored_date_raw else None
-        )
+        stored_date = date.fromisoformat(stored_date_raw) if stored_date_raw else None
 
         if stored_date == current_media_date:
             # Same media day: restore everything and keep counting.
@@ -327,9 +321,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         if media_date != self._media_date:
             # Crossed the reset boundary while running; discard the small
             # pre-boundary fragment and start the new day cleanly.
-            _LOGGER.info(
-                "%s: media day rolled over to %s, resetting", self.person_name, media_date
-            )
+            _LOGGER.info("%s: media day rolled over to %s, resetting", self.person_name, media_date)
             self._do_reset(media_date)
         elif self._active and self._checkpoint is not None:
             delta = (now - self._checkpoint).total_seconds()
@@ -352,22 +344,19 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             return
 
         effective = self._effective_budget_seconds
-        if effective <= 0 or self._accumulated_seconds >= effective:
-            if not self._is_locked:
-                self._is_locked = True
-                _LOGGER.info(
-                    "%s: budget exhausted (used=%.0fs, budget=%.0fs) -> locked",
-                    self.person_name,
-                    self._accumulated_seconds,
-                    effective,
-                )
+        if (effective <= 0 or self._accumulated_seconds >= effective) and not self._is_locked:
+            self._is_locked = True
+            _LOGGER.info(
+                "%s: budget exhausted (used=%.0fs, budget=%.0fs) -> locked",
+                self.person_name,
+                self._accumulated_seconds,
+                effective,
+            )
 
         if self._is_locked:
             playing = self._playing_players()
             if playing:
-                _LOGGER.info(
-                    "%s: locked, stopping players %s", self.person_name, playing
-                )
+                _LOGGER.info("%s: locked, stopping players %s", self.person_name, playing)
                 self.hass.async_create_task(
                     self.hass.services.async_call(
                         MP_DOMAIN,
@@ -379,12 +368,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
 
     def _maybe_warn(self) -> None:
         """Emit the one-time low-time warning when appropriate."""
-        if (
-            not self.warning_enabled
-            or self._is_locked
-            or self._is_suspended
-            or self._warned_today
-        ):
+        if not self.warning_enabled or self._is_locked or self._is_suspended or self._warned_today:
             return
 
         effective = self._effective_budget_seconds
@@ -394,7 +378,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
 
         if 0 < remaining <= threshold and playing:
             self._warned_today = True
-            remaining_minutes = max(1, int(round(remaining / 60)))
+            remaining_minutes = max(1, round(remaining / 60))
             _LOGGER.info(
                 "%s: %d min left -> warning on %s",
                 self.person_name,
@@ -410,9 +394,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             if not media_id:
                 _LOGGER.warning("%s: warning media id not configured", self.person_name)
                 return
-            media_type = self._config.get(
-                CONF_WARNING_MEDIA_TYPE, DEFAULT_WARNING_MEDIA_TYPE
-            )
+            media_type = self._config.get(CONF_WARNING_MEDIA_TYPE, DEFAULT_WARNING_MEDIA_TYPE)
             self.hass.async_create_task(
                 self.hass.services.async_call(
                     MP_DOMAIN,
@@ -458,8 +440,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         remaining = max(0.0, effective - self._accumulated_seconds)
         return {
             ATTR_BUDGET_MINUTES: self._budget_minutes_today,
-            ATTR_EFFECTIVE_BUDGET_MINUTES: self._budget_minutes_today
-            + self._extra_minutes,
+            ATTR_EFFECTIVE_BUDGET_MINUTES: self._budget_minutes_today + self._extra_minutes,
             ATTR_USED_MINUTES: round(self._accumulated_seconds / 60, 1),
             ATTR_REMAINING_MINUTES: round(remaining / 60, 1),
             ATTR_WEEKDAY: (self._media_date or dt_util.now().date()).weekday(),
@@ -547,9 +528,6 @@ class PersonGuard(DataUpdateCoordinator[dict]):
 
     def _reevaluate_locked(self) -> None:
         """Drop the lock if the (new) budget is no longer exhausted."""
-        if (
-            self._is_locked
-            and self._effective_budget_seconds > self._accumulated_seconds
-        ):
+        if self._is_locked and self._effective_budget_seconds > self._accumulated_seconds:
             self._is_locked = False
             _LOGGER.info("%s: budget available again -> unlocked", self.person_name)

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import voluptuous as vol
-
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -14,6 +12,7 @@ from homeassistant.config_entries import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers import selector
+import voluptuous as vol
 
 from .const import (
     CONF_BUDGETS,
@@ -46,9 +45,7 @@ def _budget_field(index: int) -> str:
     return f"{BUDGET_FIELD_PREFIX}{index}"
 
 
-def _players_in_use(
-    hass, exclude_entry_id: str | None = None
-) -> set[str]:
+def _players_in_use(hass, exclude_entry_id: str | None = None) -> set[str]:
     """Collect media players already assigned to other persons."""
     used: set[str] = set()
     for entry in hass.config_entries.async_entries(DOMAIN):
@@ -62,15 +59,11 @@ def _players_in_use(
 def _user_schema(defaults: dict[str, Any]) -> vol.Schema:
     return vol.Schema(
         {
-            vol.Required(CONF_NAME, default=defaults.get(CONF_NAME, "")): (
-                selector.TextSelector()
-            ),
+            vol.Required(CONF_NAME, default=defaults.get(CONF_NAME, "")): (selector.TextSelector()),
             vol.Optional(
                 CONF_PERSON_ENTITY,
                 description={"suggested_value": defaults.get(CONF_PERSON_ENTITY)},
-            ): selector.EntitySelector(
-                selector.EntitySelectorConfig(domain="person")
-            ),
+            ): selector.EntitySelector(selector.EntitySelectorConfig(domain="person")),
             vol.Required(
                 CONF_PLAYERS, default=defaults.get(CONF_PLAYERS, [])
             ): selector.EntitySelector(
@@ -85,11 +78,9 @@ def _budgets_schema(defaults: dict[str, int]) -> vol.Schema:
     for index in WEEKDAYS:
         i = int(index)
         default = defaults.get(index, DEFAULT_DAILY_MINUTES)
-        fields[vol.Required(_budget_field(i), default=default)] = (
-            selector.NumberSelector(
-                selector.NumberSelectorConfig(
-                    min=0, max=1440, step=5, mode="box", unit_of_measurement="min"
-                )
+        fields[vol.Required(_budget_field(i), default=default)] = selector.NumberSelector(
+            selector.NumberSelectorConfig(
+                min=0, max=1440, step=5, mode="box", unit_of_measurement="min"
             )
         )
     return vol.Schema(fields)
@@ -104,9 +95,7 @@ def _warning_schema(defaults: dict[str, Any]) -> vol.Schema:
             ): selector.BooleanSelector(),
             vol.Required(
                 CONF_WARNING_THRESHOLD,
-                default=defaults.get(
-                    CONF_WARNING_THRESHOLD, DEFAULT_WARNING_THRESHOLD
-                ),
+                default=defaults.get(CONF_WARNING_THRESHOLD, DEFAULT_WARNING_THRESHOLD),
             ): selector.NumberSelector(
                 selector.NumberSelectorConfig(
                     min=1, max=120, step=1, mode="box", unit_of_measurement="min"
@@ -125,24 +114,18 @@ def _warning_schema(defaults: dict[str, Any]) -> vol.Schema:
             vol.Optional(
                 CONF_TTS_ENTITY,
                 description={"suggested_value": defaults.get(CONF_TTS_ENTITY)},
-            ): selector.EntitySelector(
-                selector.EntitySelectorConfig(domain="tts")
-            ),
+            ): selector.EntitySelector(selector.EntitySelectorConfig(domain="tts")),
             vol.Optional(
                 CONF_TTS_MESSAGE,
                 default=defaults.get(CONF_TTS_MESSAGE, DEFAULT_TTS_MESSAGE),
-            ): selector.TextSelector(
-                selector.TextSelectorConfig(multiline=True)
-            ),
+            ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_WARNING_MEDIA_ID,
                 description={"suggested_value": defaults.get(CONF_WARNING_MEDIA_ID)},
             ): selector.TextSelector(),
             vol.Optional(
                 CONF_WARNING_MEDIA_TYPE,
-                default=defaults.get(
-                    CONF_WARNING_MEDIA_TYPE, DEFAULT_WARNING_MEDIA_TYPE
-                ),
+                default=defaults.get(CONF_WARNING_MEDIA_TYPE, DEFAULT_WARNING_MEDIA_TYPE),
             ): selector.TextSelector(),
         }
     )
@@ -173,9 +156,7 @@ def _validate_warning(data: dict[str, Any]) -> dict[str, str]:
 
 
 def _collect_budgets(user_input: dict[str, Any]) -> dict[str, int]:
-    return {
-        index: int(user_input[_budget_field(int(index))]) for index in WEEKDAYS
-    }
+    return {index: int(user_input[_budget_field(int(index))]) for index in WEEKDAYS}
 
 
 class MediaTimeGuardConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -186,9 +167,7 @@ class MediaTimeGuardConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         self._data: dict[str, Any] = {}
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             used = _players_in_use(self.hass)
@@ -234,17 +213,11 @@ class MediaTimeGuardConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_reset(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_reset(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             self._data.update(user_input)
-            return self.async_create_entry(
-                title=self._data[CONF_NAME], data=self._data
-            )
-        return self.async_show_form(
-            step_id="reset", data_schema=_reset_schema(self._data)
-        )
+            return self.async_create_entry(title=self._data[CONF_NAME], data=self._data)
+        return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))
 
     @staticmethod
     @callback
@@ -259,9 +232,7 @@ class MediaTimeGuardOptionsFlow(OptionsFlow):
         self._entry = entry
         self._data: dict[str, Any] = {**entry.data, **entry.options}
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             used = _players_in_use(self.hass, exclude_entry_id=self._entry.entry_id)
@@ -303,13 +274,9 @@ class MediaTimeGuardOptionsFlow(OptionsFlow):
             errors=errors,
         )
 
-    async def async_step_reset(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_reset(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             self._data.update(user_input)
             # Keep CONF_NAME stable in title; store everything in options.
             return self.async_create_entry(title="", data=self._data)
-        return self.async_show_form(
-            step_id="reset", data_schema=_reset_schema(self._data)
-        )
+        return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))

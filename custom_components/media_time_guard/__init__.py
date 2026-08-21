@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import logging
 
-import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+import voluptuous as vol
 
 from .const import (
     ATTR_MINUTES,
@@ -49,9 +48,7 @@ def _find_guard(hass: HomeAssistant, person: str) -> PersonGuard:
             continue
         if needle in (guard.person_name.casefold(), guard.slug.casefold()):
             return guard
-    raise ServiceValidationError(
-        f"No Media Time Guard person matches '{person}'"
-    )
+    raise ServiceValidationError(f"No Media Time Guard person matches '{person}'")
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -110,12 +107,8 @@ def _async_register_services(hass: HomeAssistant) -> None:
         guard = _find_guard(hass, call.data[ATTR_PERSON])
         await guard.async_reset_person()
 
-    hass.services.async_register(
-        DOMAIN, SERVICE_EXTEND_TIME, _handle_extend, schema=EXTEND_SCHEMA
-    )
+    hass.services.async_register(DOMAIN, SERVICE_EXTEND_TIME, _handle_extend, schema=EXTEND_SCHEMA)
     hass.services.async_register(
         DOMAIN, SERVICE_SUSPEND_TODAY, _handle_suspend, schema=SUSPEND_SCHEMA
     )
-    hass.services.async_register(
-        DOMAIN, SERVICE_RESET_PERSON, _handle_reset, schema=RESET_SCHEMA
-    )
+    hass.services.async_register(DOMAIN, SERVICE_RESET_PERSON, _handle_reset, schema=RESET_SCHEMA)

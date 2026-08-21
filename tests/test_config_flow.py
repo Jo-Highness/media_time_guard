@@ -23,9 +23,7 @@ from .conftest import build_entry_data
 
 async def _advance_full_flow(hass, name="Luke", players=None):
     players = players or ["media_player.test_player"]
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     assert result["step_id"] == "user"
 
     result = await hass.config_entries.flow.async_configure(
@@ -76,9 +74,7 @@ async def test_player_already_assigned(hass):
     )
     existing.add_to_hass(hass)
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {CONF_NAME: "Luke", CONF_PLAYERS: ["media_player.test_player"]},
