@@ -212,6 +212,8 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         self._unsubs.clear()
         async with self._lock:
             await self._store.async_save(self._build_storage_data())
+        # Stop the periodic poll / debouncer of the base coordinator as well.
+        await super().async_shutdown()
 
     # ------------------------------------------------------------------
     # Persistence

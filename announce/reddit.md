@@ -25,7 +25,7 @@ Services: `extend_time`, `suspend_today`, `reset_person`.
 doesn't control. Enforcement is stop/pause-based. TTS warnings need a TTS engine configured. And it's a
 time-budget tool, not full parental control / content filtering — it manages *how long*, not *what*.
 
-Version 1.1.0, min HA 2024.1, MIT. UI in 7 languages (DE/EL/EN/ES/FR/JA/NB).
+Version 1.1.0, min HA 2024.11, MIT. UI in 7 languages (DE/EL/EN/ES/FR/JA/NB).
 
 Install via HACS as a custom repository (default store once accepted):
 https://github.com/Jo-Highness/media_time_guard

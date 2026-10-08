@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+import voluptuous as vol
 
 from custom_components.media_time_guard.const import (
     DOMAIN,
@@ -33,3 +35,37 @@ async def test_setup_and_unload(hass):
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
     assert entry.entry_id not in hass.data.get(DOMAIN, {})
+
+
+async def test_extend_time_rejects_out_of_range(hass):
+    """extend_time is bounded like its UI selector (1..600 min)."""
+    entry = MockConfigEntry(domain=DOMAIN, data=build_entry_data(name="Luke"))
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    for bad in (0, 601, 10**9):
+        with pytest.raises(vol.Invalid):
+            await hass.services.async_call(
+                DOMAIN, SERVICE_EXTEND_TIME, {"person": "Luke", "minutes": bad}, blocking=True
+            )
+
+    await hass.services.async_call(
+        DOMAIN, SERVICE_EXTEND_TIME, {"person": "Luke", "minutes": 600}, blocking=True
+    )
+    guard = hass.data[DOMAIN][entry.entry_id]
+    assert guard.data["extra_minutes_today"] == 600
+
+
+async def test_unload_stops_periodic_poll(hass):
+    """After unload the base coordinator no longer schedules refreshes."""
+    entry = MockConfigEntry(domain=DOMAIN, data=build_entry_data(name="Luke"))
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    guard = hass.data[DOMAIN][entry.entry_id]
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert guard._shutdown_requested is True
+    assert guard._unsub_refresh is None

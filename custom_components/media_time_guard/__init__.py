@@ -15,6 +15,7 @@ from .const import (
     ATTR_PERSON,
     ATTR_SUSPENDED,
     DOMAIN,
+    EXTRA_MINUTES_MAX,
     SERVICE_EXTEND_TIME,
     SERVICE_RESET_PERSON,
     SERVICE_SUSPEND_TODAY,
@@ -28,7 +29,9 @@ PLATFORMS = ["sensor", "switch", "number", "button"]
 EXTEND_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_PERSON): cv.string,
-        vol.Required(ATTR_MINUTES): vol.All(vol.Coerce(int), vol.Range(min=1)),
+        vol.Required(ATTR_MINUTES): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=EXTRA_MINUTES_MAX)
+        ),
     }
 )
 SUSPEND_SCHEMA = vol.Schema(

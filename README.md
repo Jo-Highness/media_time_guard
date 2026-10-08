@@ -16,7 +16,7 @@
   <a href="https://github.com/Jo-Highness/media_time_guard/actions/workflows/test.yml"><img src="https://github.com/Jo-Highness/media_time_guard/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
   <a href="https://github.com/Jo-Highness/media_time_guard/releases"><img src="https://img.shields.io/github/v/release/Jo-Highness/media_time_guard" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT"></a>
-  <img src="https://img.shields.io/badge/Home%20Assistant-2024.1%2B-41BDF5.svg" alt="Home Assistant 2024.1+">
+  <img src="https://img.shields.io/badge/Home%20Assistant-2024.11%2B-41BDF5.svg" alt="Home Assistant 2024.11+">
 </p>
 
 Every parent knows the scene: *"Just five more minutes!"* — for the third time.

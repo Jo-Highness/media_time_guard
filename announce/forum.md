@@ -72,7 +72,7 @@ I want to be clear about what this is and is not:
 
 ## Details
 
-- Version **1.1.0**, minimum Home Assistant **2024.1**, licensed **MIT**.
+- Version **1.1.0**, minimum Home Assistant **2024.11**, licensed **MIT**.
 - UI translated into **7 languages**: German, Greek, English, Spanish, French, Japanese, Norwegian Bokmål.
 
 ## Install
