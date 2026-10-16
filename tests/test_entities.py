@@ -73,7 +73,10 @@ async def test_entity_names_and_device(hass):
     entry = await setup_person(hass, name="Luke")
     assert hass.states.get("button.media_time_luke_extend_15").name == "Luke Add 15 min"
     assert hass.states.get("sensor.media_time_luke_remaining").name == "Luke Remaining time"
-    device = dr.async_get(hass).async_get_device(identifiers={(DOMAIN, entry.entry_id)})
+    devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
+    assert len(devices) == 1
+    device = devices[0]
+    assert device.identifiers == {(DOMAIN, entry.entry_id)}
     assert device.name == "Luke"
     assert device.entry_type is dr.DeviceEntryType.SERVICE
 
