@@ -1,8 +1,8 @@
 # Media Time Guard – Guide utilisateur (Français)
 
 Media Time Guard limite le temps multimédia quotidien d'une personne sur ses lecteurs
-(par ex. Sonos One) et applique la limite de façon fiable, même quand les enfants tentent
-de la contourner.
+(par ex. Sonos One) et les arrête une fois le budget quotidien épuisé. Seul l'état `playing` des lecteurs
+attribués est compté ; les autres appareils et applications ne sont pas couverts.
 
 ## 1. Installation
 
@@ -21,8 +21,7 @@ de la contourner.
 Une entrée est créée par personne. L'assistant comporte quatre étapes :
 
 1. **Personne et lecteurs**
-   - **Nom** : par ex. `Luke`. (Les enfants n'ont souvent pas d'entité `person` : saisissez le nom.)
-   - **Entité personne** (facultatif) : si elle existe.
+   - **Nom** : par ex. `Luke` (doit être unique).
    - **Lecteurs multimédias** : un ou plusieurs. Un lecteur ne peut appartenir qu'à **une** personne.
 2. **Budgets quotidiens** : minutes du lundi au dimanche. `0` = bloqué toute la journée.
 3. **Avertissement** (facultatif) : activé/désactivé, seuil de temps restant (minutes), méthode :

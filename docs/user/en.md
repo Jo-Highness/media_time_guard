@@ -1,7 +1,8 @@
 # Media Time Guard – User Guide (English)
 
 Media Time Guard limits a person's daily media time on their media players (e.g. Sonos One)
-and enforces the limit reliably — even when children try to bypass it.
+and stops them once the daily budget is used up. Only the `playing` state of the assigned
+players counts; other devices and apps are not covered.
 
 ## 1. Installation
 
@@ -20,8 +21,7 @@ and enforces the limit reliably — even when children try to bypass it.
 One entry is created per person. The wizard has four steps:
 
 1. **Person & players**
-   - **Name**: e.g. `Luke`. (Children often have no `person` entity — just type the name.)
-   - **Person entity** (optional): if one exists.
+   - **Name**: e.g. `Luke` (must be unique).
    - **Media players**: one or more. A player may belong to only **one** person.
 2. **Daily budgets**: minutes for Monday–Sunday. `0` = blocked all day.
 3. **Warning** (optional): on/off, remaining-time threshold (minutes), method:

@@ -1,8 +1,8 @@
 # Media Time Guard – Benutzerhandbuch (Deutsch)
 
 Media Time Guard begrenzt die tägliche Medienzeit einer Person auf deren Media-Playern
-(z. B. Sonos One) und setzt die Grenze zuverlässig durch – auch wenn Kinder versuchen, sie
-zu umgehen.
+(z. B. Sonos One) und stoppt sie, sobald das Tagesbudget aufgebraucht ist. Gezählt wird nur der Zustand
+`playing` der zugeordneten Player; andere Geräte und Apps werden nicht erfasst.
 
 ## 1. Installation
 
@@ -21,9 +21,7 @@ kopieren und HA neu starten.
 Pro Person wird ein eigener Eintrag angelegt. Der Assistent hat vier Schritte:
 
 1. **Person & Player**
-   - **Name**: z. B. `Luke`. (Kinder haben oft keine eigene `person`-Entität – dann einfach
-     den Namen eintippen.)
-   - **Person-Entität** (optional): falls vorhanden.
+   - **Name**: z. B. `Luke` (muss eindeutig sein).
    - **Media-Player**: eine oder mehrere. Ein Player darf nur **einer** Person zugeordnet sein.
 2. **Tagesbudgets**: Minuten für Montag bis Sonntag. `0` = an diesem Tag komplett gesperrt.
 3. **Warnung** (optional): aktiv ja/nein, Restzeit-Schwelle (Minuten), Methode:
