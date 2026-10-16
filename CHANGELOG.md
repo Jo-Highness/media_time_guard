@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- hassfest: English action error messages no longer wrap placeholders in single quotes
+  (`strings.json`, `en.json`); the current hassfest rejects that.
+
 ## [1.2.0] - 2026-10-16
 
 > **Upgrade notes:** minimum Home Assistant version is now **2025.2.0**. Existing entities keep

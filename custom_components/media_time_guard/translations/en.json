@@ -215,13 +215,13 @@
   },
   "exceptions": {
     "person_not_found": {
-      "message": "No Media Time Guard person matches '{person}'."
+      "message": "No Media Time Guard person matches {person}."
     },
     "entry_not_found": {
-      "message": "No Media Time Guard entry with ID '{entry_id}' exists."
+      "message": "No Media Time Guard entry with ID {entry_id} exists."
     },
     "entry_not_loaded": {
-      "message": "The Media Time Guard entry '{name}' is not loaded."
+      "message": "The Media Time Guard entry {name} is not loaded."
     }
   },
   "issues": {
