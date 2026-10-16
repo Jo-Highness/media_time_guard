@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-16
+
+> **Upgrade notes:** minimum Home Assistant version is now **2025.2.0**. Existing entities keep
+> their entity IDs. Existing entries keep their stored announcement text; the language-dependent
+> default only applies to new entries or when the text is cleared.
+
+### Fixed
+
+- An active lock is now lifted whenever the budget is no longer exhausted — also after the
+  weekday budget was raised in the options (previously the lock restored after the reload
+  stayed until the next day). Only extra minutes lifted it before.
+- The one-time warning is re-armed when extra minutes push the remaining time above the
+  threshold again, so it plays once more before the new end.
+- Options flow: optional fields (TTS engine, text, media ID/type) can be cleared; previously the
+  old values were kept.
+- Options flow: renaming a person now updates the entry title, refuses names used by another
+  person and keeps the entry's unique ID. Actions also match the entry title, and a new entry
+  can reuse a name that was freed by a rename.
+- `media_stop`, `play_media` and `tts.speak` calls run as config-entry background tasks and
+  failures are logged instead of being lost in fire-and-forget tasks.
+- The guard was shut down twice on unload (state saved twice).
+
+### Added
+
+- Optional `config_entry_id` field for all actions (stays valid after a rename); `person` is now
+  optional, one of both is required.
+- Repair issue when an assigned media player or the TTS entity no longer exists.
+- Diagnostics download (names, entity IDs and texts redacted).
+- Help texts in the setup/options forms.
+
+### Changed
+
+- Removed the unused "Person entity (optional)" field from setup and options (it was never used
+  by the logic; entries that contain it keep working).
+- The default TTS announcement follows the Home Assistant UI language (de, el, en, es, fr, ja,
+  nb; English otherwise) instead of always German.
+- Remaining-time sensor and extra-minutes number use the `duration` device class; device is a
+  service device; icons moved to `icons.json`.
+- Modernised internals: `entry.runtime_data`, actions registered in `async_setup` with
+  translated errors, `Platform` enum, `AddConfigEntryEntitiesCallback`, options flow without
+  custom `__init__`.
+- Docs: quick start, modern automation syntax, example dashboard card, which player states
+  count and what the integration cannot control, entity-ID behaviour on renames; German and
+  Spanish READMEs synced with the English one.
+
+### CI
+
+- Test requirements pinned (`pytest-homeassistant-custom-component==0.13.316`), coverage
+  report, Ruff target `py313`, Dependabot for pip.
+
 ## [1.1.2] - 2026-10-09
 
 > **Note:** this patch release raises the minimum Home Assistant version to **2024.11.0** (see Fixed). Older versions could not set up the integration anyway.
@@ -51,8 +101,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TTS pre-warning, bonus minutes (button/slider/service) and a per-day "sick day" override switch.
 - Full config-flow setup (no YAML), coordinator, and test suite (passing on HA 2026.2).
 
-[Unreleased]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/Jo-Highness/media_time_guard/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/Jo-Highness/media_time_guard/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/Jo-Highness/media_time_guard/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Jo-Highness/media_time_guard/releases/tag/v1.0.0
