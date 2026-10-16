@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
+from uuid import uuid4
 
 from homeassistant.config_entries import (
     ConfigEntry,
@@ -10,7 +11,7 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
     OptionsFlow,
 )
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
 import voluptuous as vol
 
@@ -29,14 +30,33 @@ from .const import (
     CONF_WARNING_THRESHOLD,
     DEFAULT_DAILY_MINUTES,
     DEFAULT_RESET_TIME,
-    DEFAULT_TTS_MESSAGE,
     DEFAULT_WARNING_MEDIA_TYPE,
     DEFAULT_WARNING_THRESHOLD,
     DOMAIN,
     WARNING_METHOD_MEDIA,
     WARNING_METHOD_TTS,
     WEEKDAYS,
+    default_tts_message,
 )
+
+# Keys owned by each step. When a step is submitted these keys are dropped
+# first and then re-filled from the user input, so optional fields that the
+# user cleared really disappear (instead of keeping their old value).
+# CONF_PERSON_ENTITY is a legacy key (<= 1.1.x) that is dropped on edit.
+USER_STEP_KEYS = (CONF_NAME, CONF_PLAYERS, CONF_PERSON_ENTITY)
+WARNING_STEP_KEYS = (
+    CONF_WARNING_ENABLED,
+    CONF_WARNING_THRESHOLD,
+    CONF_WARNING_METHOD,
+    CONF_TTS_ENTITY,
+    CONF_TTS_MESSAGE,
+    CONF_WARNING_MEDIA_ID,
+    CONF_WARNING_MEDIA_TYPE,
+)
+RESET_STEP_KEYS = (CONF_RESET_TIME,)
+
+# Shown literally in the labels/help texts of the warning step.
+WARNING_PLACEHOLDERS = {"minutes": "{minutes}"}
 
 BUDGET_FIELD_PREFIX = "budget_"
 
@@ -45,7 +65,30 @@ def _budget_field(index: int) -> str:
     return f"{BUDGET_FIELD_PREFIX}{index}"
 
 
-def _players_in_use(hass, exclude_entry_id: str | None = None) -> set[str]:
+def _apply_step(data: dict[str, Any], user_input: dict[str, Any], keys: tuple[str, ...]) -> None:
+    """Replace the keys owned by a step with the submitted values."""
+    for key in keys:
+        data.pop(key, None)
+    for key, value in user_input.items():
+        if value is None or value == "":
+            continue
+        data[key] = value.strip() if key == CONF_NAME and isinstance(value, str) else value
+
+
+def _name_in_use(hass: HomeAssistant, name: str, exclude_entry_id: str | None = None) -> bool:
+    """Return True if another entry already uses ``name`` (case-insensitive)."""
+    needle = name.strip().casefold()
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        if entry.entry_id == exclude_entry_id:
+            continue
+        merged = {**entry.data, **entry.options}
+        names = {str(merged.get(CONF_NAME, "")).strip().casefold(), entry.title.casefold()}
+        if needle in names:
+            return True
+    return False
+
+
+def _players_in_use(hass: HomeAssistant, exclude_entry_id: str | None = None) -> set[str]:
     """Collect media players already assigned to other persons."""
     used: set[str] = set()
     for entry in hass.config_entries.async_entries(DOMAIN):
@@ -60,10 +103,6 @@ def _user_schema(defaults: dict[str, Any]) -> vol.Schema:
     return vol.Schema(
         {
             vol.Required(CONF_NAME, default=defaults.get(CONF_NAME, "")): (selector.TextSelector()),
-            vol.Optional(
-                CONF_PERSON_ENTITY,
-                description={"suggested_value": defaults.get(CONF_PERSON_ENTITY)},
-            ): selector.EntitySelector(selector.EntitySelectorConfig(domain="person")),
             vol.Required(
                 CONF_PLAYERS, default=defaults.get(CONF_PLAYERS, [])
             ): selector.EntitySelector(
@@ -87,6 +126,7 @@ def _budgets_schema(defaults: dict[str, int]) -> vol.Schema:
 
 
 def _warning_schema(defaults: dict[str, Any]) -> vol.Schema:
+    # Optional fields use suggested values (not defaults) so they can be cleared.
     return vol.Schema(
         {
             vol.Required(
@@ -117,7 +157,7 @@ def _warning_schema(defaults: dict[str, Any]) -> vol.Schema:
             ): selector.EntitySelector(selector.EntitySelectorConfig(domain="tts")),
             vol.Optional(
                 CONF_TTS_MESSAGE,
-                default=defaults.get(CONF_TTS_MESSAGE, DEFAULT_TTS_MESSAGE),
+                description={"suggested_value": defaults.get(CONF_TTS_MESSAGE)},
             ): selector.TextSelector(selector.TextSelectorConfig(multiline=True)),
             vol.Optional(
                 CONF_WARNING_MEDIA_ID,
@@ -125,7 +165,7 @@ def _warning_schema(defaults: dict[str, Any]) -> vol.Schema:
             ): selector.TextSelector(),
             vol.Optional(
                 CONF_WARNING_MEDIA_TYPE,
-                default=defaults.get(CONF_WARNING_MEDIA_TYPE, DEFAULT_WARNING_MEDIA_TYPE),
+                description={"suggested_value": defaults.get(CONF_WARNING_MEDIA_TYPE)},
             ): selector.TextSelector(),
         }
     )
@@ -170,18 +210,25 @@ class MediaTimeGuardConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
+            name = user_input[CONF_NAME].strip()
             used = _players_in_use(self.hass)
-            clash = set(user_input[CONF_PLAYERS]) & used
-            if clash:
+            if not name:
+                errors["base"] = "name_required"
+            elif set(user_input[CONF_PLAYERS]) & used:
                 errors["base"] = "player_in_use"
             elif not user_input[CONF_PLAYERS]:
                 errors["base"] = "no_players"
             else:
-                await self.async_set_unique_id(
-                    f"{DOMAIN}_{user_input[CONF_NAME].strip().casefold()}"
-                )
+                if _name_in_use(self.hass, name):
+                    return self.async_abort(reason="already_configured")
+                unique_id = f"{DOMAIN}_{name.casefold()}"
+                if self.hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, unique_id):
+                    # The unique_id is never changed on rename, so a renamed
+                    # person can still hold the id derived from this name.
+                    unique_id = f"{unique_id}_{uuid4().hex[:8]}"
+                await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
-                self._data.update(user_input)
+                _apply_step(self._data, user_input, USER_STEP_KEYS)
                 return await self.async_step_budgets()
         return self.async_show_form(
             step_id="user", data_schema=_user_schema(self._data), errors=errors
@@ -205,44 +252,55 @@ class MediaTimeGuardConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             errors = _validate_warning(user_input)
             if not errors:
-                self._data.update(user_input)
+                _apply_step(self._data, user_input, WARNING_STEP_KEYS)
                 return await self.async_step_reset()
+        defaults = {
+            CONF_TTS_MESSAGE: default_tts_message(self.hass.config.language),
+            CONF_WARNING_MEDIA_TYPE: DEFAULT_WARNING_MEDIA_TYPE,
+            **self._data,
+        }
         return self.async_show_form(
             step_id="warning",
-            data_schema=_warning_schema(self._data),
+            data_schema=_warning_schema(defaults),
             errors=errors,
+            description_placeholders=WARNING_PLACEHOLDERS,
         )
 
     async def async_step_reset(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            self._data.update(user_input)
-            return self.async_create_entry(title=self._data[CONF_NAME], data=self._data)
+            _apply_step(self._data, user_input, RESET_STEP_KEYS)
+            return self.async_create_entry(title=self._data[CONF_NAME], data=dict(self._data))
         return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))
 
     @staticmethod
     @callback
     def async_get_options_flow(entry: ConfigEntry) -> MediaTimeGuardOptionsFlow:
-        return MediaTimeGuardOptionsFlow(entry)
+        return MediaTimeGuardOptionsFlow()
 
 
 class MediaTimeGuardOptionsFlow(OptionsFlow):
     """Allow editing every setting of an existing person."""
 
-    def __init__(self, entry: ConfigEntry) -> None:
-        self._entry = entry
-        self._data: dict[str, Any] = {**entry.data, **entry.options}
+    _data: dict[str, Any]
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        entry = self.config_entry
+        if not hasattr(self, "_data"):
+            self._data = {**entry.data, **entry.options}
         errors: dict[str, str] = {}
         if user_input is not None:
-            used = _players_in_use(self.hass, exclude_entry_id=self._entry.entry_id)
-            clash = set(user_input[CONF_PLAYERS]) & used
-            if clash:
+            name = user_input[CONF_NAME].strip()
+            used = _players_in_use(self.hass, exclude_entry_id=entry.entry_id)
+            if not name:
+                errors["base"] = "name_required"
+            elif _name_in_use(self.hass, name, exclude_entry_id=entry.entry_id):
+                errors["base"] = "name_in_use"
+            elif set(user_input[CONF_PLAYERS]) & used:
                 errors["base"] = "player_in_use"
             elif not user_input[CONF_PLAYERS]:
                 errors["base"] = "no_players"
             else:
-                self._data.update(user_input)
+                _apply_step(self._data, user_input, USER_STEP_KEYS)
                 return await self.async_step_budgets()
         return self.async_show_form(
             step_id="init", data_schema=_user_schema(self._data), errors=errors
@@ -266,17 +324,23 @@ class MediaTimeGuardOptionsFlow(OptionsFlow):
         if user_input is not None:
             errors = _validate_warning(user_input)
             if not errors:
-                self._data.update(user_input)
+                _apply_step(self._data, user_input, WARNING_STEP_KEYS)
                 return await self.async_step_reset()
         return self.async_show_form(
             step_id="warning",
             data_schema=_warning_schema(self._data),
             errors=errors,
+            description_placeholders=WARNING_PLACEHOLDERS,
         )
 
     async def async_step_reset(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            self._data.update(user_input)
-            # Keep CONF_NAME stable in title; store everything in options.
-            return self.async_create_entry(title="", data=self._data)
+            _apply_step(self._data, user_input, RESET_STEP_KEYS)
+            # Keep the entry title in sync with the (possibly renamed) person so
+            # the UI and name-based service calls match. Title and options are
+            # written in one update -> exactly one reload. The unique_id stays.
+            self.hass.config_entries.async_update_entry(
+                self.config_entry, title=self._data[CONF_NAME], options=dict(self._data)
+            )
+            return self.async_create_entry(data=dict(self._data))
         return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))

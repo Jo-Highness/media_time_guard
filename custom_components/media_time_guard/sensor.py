@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTime
+from homeassistant.const import Platform, UnitOfTime
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from . import MediaTimeGuardConfigEntry
 from .const import (
     ATTR_BUDGET_MINUTES,
     ATTR_EFFECTIVE_BUDGET_MINUTES,
@@ -24,33 +25,32 @@ from .const import (
     ATTR_USED_MINUTES,
     ATTR_WARNED_TODAY,
     ATTR_WEEKDAY,
-    DOMAIN,
 )
 from .coordinator import PersonGuard
 from .entity import MediaTimeGuardEntity
 
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    entry: MediaTimeGuardConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up the remaining-time sensor."""
-    guard: PersonGuard = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([RemainingSensor(guard)])
+    async_add_entities([RemainingSensor(entry.runtime_data)])
 
 
 class RemainingSensor(MediaTimeGuardEntity, SensorEntity):
     """Remaining media minutes for today (main variable)."""
 
+    _attr_device_class = SensorDeviceClass.DURATION
     _attr_native_unit_of_measurement = UnitOfTime.MINUTES
-    _attr_icon = "mdi:timer-music-outline"
     _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_translation_key = "remaining"
 
     def __init__(self, coordinator: PersonGuard) -> None:
-        super().__init__(coordinator, "remaining")
-        self._attr_translation_key = "remaining"
-        self.entity_id = f"sensor.media_time_{coordinator.slug}_remaining"
+        super().__init__(coordinator, "remaining", Platform.SENSOR, "remaining")
 
     @property
     def native_value(self) -> float | None:

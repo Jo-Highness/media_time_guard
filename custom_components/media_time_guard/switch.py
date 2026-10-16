@@ -5,34 +5,34 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import ATTR_IS_SUSPENDED, DOMAIN
+from . import MediaTimeGuardConfigEntry
+from .const import ATTR_IS_SUSPENDED
 from .coordinator import PersonGuard
 from .entity import MediaTimeGuardEntity
+
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    entry: MediaTimeGuardConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up the suspend switch."""
-    guard: PersonGuard = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([SuspendTodaySwitch(guard)])
+    async_add_entities([SuspendTodaySwitch(entry.runtime_data)])
 
 
 class SuspendTodaySwitch(MediaTimeGuardEntity, SwitchEntity):
     """Suspend enforcement for today (e.g. the child is ill)."""
 
-    _attr_icon = "mdi:account-clock"
+    _attr_translation_key = "suspend_today"
 
     def __init__(self, coordinator: PersonGuard) -> None:
-        super().__init__(coordinator, "suspend_today")
-        self._attr_translation_key = "suspend_today"
-        self.entity_id = f"switch.media_time_{coordinator.slug}_suspend_today"
+        super().__init__(coordinator, "suspend_today", Platform.SWITCH, "suspend_today")
 
     @property
     def is_on(self) -> bool:

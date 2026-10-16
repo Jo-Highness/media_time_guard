@@ -3,11 +3,14 @@
     "step": {
       "user": {
         "title": "Media Time Guard – Person",
-        "description": "Create a media-time budget for one person. Bind to a person entity if available, otherwise just enter a name (e.g. for children without a person entity).",
+        "description": "Create a media-time budget for one person (usually a child). Enter a name and pick the media players this person uses.",
         "data": {
           "name": "Name",
-          "person_entity": "Person entity (optional)",
           "players": "Media players for this person"
+        },
+        "data_description": {
+          "name": "Shown as device name and used by the actions (e.g. `Luke`). Must be unique.",
+          "players": "Time counts while at least one of these players is `playing`. Each player can belong to only one person."
         }
       },
       "budgets": {
@@ -34,6 +37,11 @@
           "tts_message": "Announcement text ({minutes} = remaining minutes)",
           "warning_media_id": "Media content ID / URL",
           "warning_media_type": "Media content type"
+        },
+        "data_description": {
+          "warning_threshold": "The warning is played once when the remaining time drops to this value.",
+          "tts_message": "Leave empty to use the default text in your Home Assistant language. `{minutes}` is replaced by the remaining minutes.",
+          "warning_media_type": "For example `music`. Leave empty for `music`."
         }
       },
       "reset": {
@@ -41,6 +49,9 @@
         "description": "Time of day at which the daily count is reset.",
         "data": {
           "reset_time": "Reset time"
+        },
+        "data_description": {
+          "reset_time": "Counters, lock, suspension and warning are reset daily at this time."
         }
       }
     },
@@ -48,7 +59,8 @@
       "player_in_use": "At least one selected media player is already assigned to another person.",
       "no_players": "Select at least one media player.",
       "tts_entity_required": "Choose a TTS engine when the warning method is TTS.",
-      "media_id_required": "Enter a media content ID when the warning method is Media."
+      "media_id_required": "Enter a media content ID when the warning method is Media.",
+      "name_required": "Enter a name."
     },
     "abort": {
       "already_configured": "A person with this name is already configured."
@@ -58,11 +70,14 @@
     "step": {
       "init": {
         "title": "Person & players",
-        "description": "Edit the name, optional person entity and the assigned media players.",
+        "description": "Edit the name and the assigned media players. Renaming keeps the existing entity IDs.",
         "data": {
           "name": "Name",
-          "person_entity": "Person entity (optional)",
           "players": "Media players for this person"
+        },
+        "data_description": {
+          "name": "Shown as device name and used by the actions (e.g. `Luke`). Must be unique.",
+          "players": "Time counts while at least one of these players is `playing`. Each player can belong to only one person."
         }
       },
       "budgets": {
@@ -89,6 +104,11 @@
           "tts_message": "Announcement text ({minutes} = remaining minutes)",
           "warning_media_id": "Media content ID / URL",
           "warning_media_type": "Media content type"
+        },
+        "data_description": {
+          "warning_threshold": "The warning is played once when the remaining time drops to this value.",
+          "tts_message": "Leave empty to use the default text in your Home Assistant language. `{minutes}` is replaced by the remaining minutes.",
+          "warning_media_type": "For example `music`. Leave empty for `music`."
         }
       },
       "reset": {
@@ -96,6 +116,9 @@
         "description": "Time of day at which the daily count is reset.",
         "data": {
           "reset_time": "Reset time"
+        },
+        "data_description": {
+          "reset_time": "Counters, lock, suspension and warning are reset daily at this time."
         }
       }
     },
@@ -103,7 +126,9 @@
       "player_in_use": "At least one selected media player is already assigned to another person.",
       "no_players": "Select at least one media player.",
       "tts_entity_required": "Choose a TTS engine when the warning method is TTS.",
-      "media_id_required": "Enter a media content ID when the warning method is Media."
+      "media_id_required": "Enter a media content ID when the warning method is Media.",
+      "name_required": "Enter a name.",
+      "name_in_use": "Another person already uses this name."
     }
   },
   "selector": {
@@ -121,7 +146,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Name (or slug) of the configured person."
+          "description": "Name (or slug) of the configured person. Alternatively use the config entry."
+        },
+        "config_entry_id": {
+          "name": "Person (config entry)",
+          "description": "The Media Time Guard entry of the person. Stays valid when the person is renamed."
         },
         "minutes": {
           "name": "Minutes",
@@ -135,7 +164,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Name (or slug) of the configured person."
+          "description": "Name (or slug) of the configured person. Alternatively use the config entry."
+        },
+        "config_entry_id": {
+          "name": "Person (config entry)",
+          "description": "The Media Time Guard entry of the person. Stays valid when the person is renamed."
         },
         "suspended": {
           "name": "Suspended",
@@ -149,7 +182,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Name (or slug) of the configured person."
+          "description": "Name (or slug) of the configured person. Alternatively use the config entry."
+        },
+        "config_entry_id": {
+          "name": "Person (config entry)",
+          "description": "The Media Time Guard entry of the person. Stays valid when the person is renamed."
         }
       }
     }
@@ -174,6 +211,23 @@
       "extend": {
         "name": "Add {minutes} min"
       }
+    }
+  },
+  "exceptions": {
+    "person_not_found": {
+      "message": "No Media Time Guard person matches '{person}'."
+    },
+    "entry_not_found": {
+      "message": "No Media Time Guard entry with ID '{entry_id}' exists."
+    },
+    "entry_not_loaded": {
+      "message": "The Media Time Guard entry '{name}' is not loaded."
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "Media Time Guard: assigned entities missing for {name}",
+      "description": "These entities are assigned to **{name}** but no longer exist: {entities}\n\nIf you renamed or replaced a media player or TTS engine, open **Settings → Devices & services → Media Time Guard → {name} → Configure** and select the current entities. Missing media players are neither counted nor stopped."
     }
   }
 }

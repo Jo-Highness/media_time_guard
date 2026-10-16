@@ -3,11 +3,14 @@
     "step": {
       "user": {
         "title": "Media Time Guard – Person",
-        "description": "Lege ein Medienzeit-Budget für eine Person an. Binde nach Möglichkeit eine Person-Entität ein, ansonsten gib einfach einen Namen ein (z. B. für Kinder ohne Person-Entität).",
+        "description": "Lege ein Medienzeit-Budget für eine Person (meist ein Kind) an. Gib einen Namen ein und wähle die Media-Player, die diese Person nutzt.",
         "data": {
           "name": "Name",
-          "person_entity": "Person-Entität (optional)",
           "players": "Media-Player dieser Person"
+        },
+        "data_description": {
+          "name": "Wird als Gerätename angezeigt und von den Aktionen verwendet (z. B. `Luke`). Muss eindeutig sein.",
+          "players": "Gezählt wird, solange mindestens einer dieser Player `playing` meldet. Jeder Player kann nur einer Person gehören."
         }
       },
       "budgets": {
@@ -34,6 +37,11 @@
           "tts_message": "Ansagetext ({minutes} = Restminuten)",
           "warning_media_id": "Medien-Content-ID / URL",
           "warning_media_type": "Medien-Content-Typ"
+        },
+        "data_description": {
+          "warning_threshold": "Die Warnung wird einmal abgespielt, wenn die Restzeit auf diesen Wert fällt.",
+          "tts_message": "Leer lassen, um den Standardtext in deiner Home-Assistant-Sprache zu verwenden. `{minutes}` wird durch die Restminuten ersetzt.",
+          "warning_media_type": "Zum Beispiel `music`. Leer lassen für `music`."
         }
       },
       "reset": {
@@ -41,6 +49,9 @@
         "description": "Uhrzeit, zu der die Tageszählung zurückgesetzt wird.",
         "data": {
           "reset_time": "Reset-Uhrzeit"
+        },
+        "data_description": {
+          "reset_time": "Zähler, Sperre, Aussetzen und Warnung werden täglich zu dieser Uhrzeit zurückgesetzt."
         }
       }
     },
@@ -48,7 +59,8 @@
       "player_in_use": "Mindestens einer der gewählten Media-Player ist bereits einer anderen Person zugeordnet.",
       "no_players": "Wähle mindestens einen Media-Player.",
       "tts_entity_required": "Wähle eine TTS-Engine, wenn die Warnmethode TTS ist.",
-      "media_id_required": "Gib eine Medien-Content-ID an, wenn die Warnmethode Medien ist."
+      "media_id_required": "Gib eine Medien-Content-ID an, wenn die Warnmethode Medien ist.",
+      "name_required": "Gib einen Namen ein."
     },
     "abort": {
       "already_configured": "Eine Person mit diesem Namen ist bereits konfiguriert."
@@ -58,11 +70,14 @@
     "step": {
       "init": {
         "title": "Person & Player",
-        "description": "Bearbeite Namen, optionale Person-Entität und die zugeordneten Media-Player.",
+        "description": "Bearbeite den Namen und die zugeordneten Media-Player. Bei einer Umbenennung bleiben die bestehenden Entitäts-IDs erhalten.",
         "data": {
           "name": "Name",
-          "person_entity": "Person-Entität (optional)",
           "players": "Media-Player dieser Person"
+        },
+        "data_description": {
+          "name": "Wird als Gerätename angezeigt und von den Aktionen verwendet (z. B. `Luke`). Muss eindeutig sein.",
+          "players": "Gezählt wird, solange mindestens einer dieser Player `playing` meldet. Jeder Player kann nur einer Person gehören."
         }
       },
       "budgets": {
@@ -89,6 +104,11 @@
           "tts_message": "Ansagetext ({minutes} = Restminuten)",
           "warning_media_id": "Medien-Content-ID / URL",
           "warning_media_type": "Medien-Content-Typ"
+        },
+        "data_description": {
+          "warning_threshold": "Die Warnung wird einmal abgespielt, wenn die Restzeit auf diesen Wert fällt.",
+          "tts_message": "Leer lassen, um den Standardtext in deiner Home-Assistant-Sprache zu verwenden. `{minutes}` wird durch die Restminuten ersetzt.",
+          "warning_media_type": "Zum Beispiel `music`. Leer lassen für `music`."
         }
       },
       "reset": {
@@ -96,6 +116,9 @@
         "description": "Uhrzeit, zu der die Tageszählung zurückgesetzt wird.",
         "data": {
           "reset_time": "Reset-Uhrzeit"
+        },
+        "data_description": {
+          "reset_time": "Zähler, Sperre, Aussetzen und Warnung werden täglich zu dieser Uhrzeit zurückgesetzt."
         }
       }
     },
@@ -103,7 +126,9 @@
       "player_in_use": "Mindestens einer der gewählten Media-Player ist bereits einer anderen Person zugeordnet.",
       "no_players": "Wähle mindestens einen Media-Player.",
       "tts_entity_required": "Wähle eine TTS-Engine, wenn die Warnmethode TTS ist.",
-      "media_id_required": "Gib eine Medien-Content-ID an, wenn die Warnmethode Medien ist."
+      "media_id_required": "Gib eine Medien-Content-ID an, wenn die Warnmethode Medien ist.",
+      "name_required": "Gib einen Namen ein.",
+      "name_in_use": "Dieser Name wird bereits von einer anderen Person verwendet."
     }
   },
   "selector": {
@@ -121,7 +146,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Name (oder Slug) der konfigurierten Person."
+          "description": "Name (oder Slug) der konfigurierten Person. Alternativ den Konfigurationseintrag verwenden."
+        },
+        "config_entry_id": {
+          "name": "Person (Konfigurationseintrag)",
+          "description": "Der Media-Time-Guard-Eintrag der Person. Bleibt auch nach einer Umbenennung gültig."
         },
         "minutes": {
           "name": "Minuten",
@@ -135,7 +164,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Name (oder Slug) der konfigurierten Person."
+          "description": "Name (oder Slug) der konfigurierten Person. Alternativ den Konfigurationseintrag verwenden."
+        },
+        "config_entry_id": {
+          "name": "Person (Konfigurationseintrag)",
+          "description": "Der Media-Time-Guard-Eintrag der Person. Bleibt auch nach einer Umbenennung gültig."
         },
         "suspended": {
           "name": "Ausgesetzt",
@@ -149,7 +182,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Name (oder Slug) der konfigurierten Person."
+          "description": "Name (oder Slug) der konfigurierten Person. Alternativ den Konfigurationseintrag verwenden."
+        },
+        "config_entry_id": {
+          "name": "Person (Konfigurationseintrag)",
+          "description": "Der Media-Time-Guard-Eintrag der Person. Bleibt auch nach einer Umbenennung gültig."
         }
       }
     }
@@ -174,6 +211,23 @@
       "extend": {
         "name": "+{minutes} Min"
       }
+    }
+  },
+  "exceptions": {
+    "person_not_found": {
+      "message": "Keine Media-Time-Guard-Person passt zu „{person}“."
+    },
+    "entry_not_found": {
+      "message": "Es gibt keinen Media-Time-Guard-Eintrag mit der ID „{entry_id}“."
+    },
+    "entry_not_loaded": {
+      "message": "Der Media-Time-Guard-Eintrag „{name}“ ist nicht geladen."
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "Media Time Guard: zugeordnete Entitäten fehlen bei {name}",
+      "description": "Diese Entitäten sind **{name}** zugeordnet, existieren aber nicht mehr: {entities}\n\nWenn du einen Media-Player oder eine TTS-Engine umbenannt oder ersetzt hast, öffne **Einstellungen → Geräte & Dienste → Media Time Guard → {name} → Konfigurieren** und wähle die aktuellen Entitäten. Fehlende Media-Player werden weder gezählt noch gestoppt."
     }
   }
 }

@@ -3,11 +3,14 @@
     "step": {
       "user": {
         "title": "Media Time Guard – Person",
-        "description": "Opprett et mediebudsjett for én person. Knytt til en person-entitet hvis mulig, ellers skriv bare inn et navn (f.eks. for barn uten person-entitet).",
+        "description": "Opprett et medietidsbudsjett for én person (vanligvis et barn). Skriv inn et navn og velg mediespillerne denne personen bruker.",
         "data": {
           "name": "Navn",
-          "person_entity": "Person-entitet (valgfritt)",
           "players": "Mediespillere for denne personen"
+        },
+        "data_description": {
+          "name": "Vises som enhetsnavn og brukes av handlingene (f.eks. `Luke`). Må være unikt.",
+          "players": "Tiden telles så lenge minst én av disse spillerne er `playing`. Hver spiller kan bare tilhøre én person."
         }
       },
       "budgets": {
@@ -34,6 +37,11 @@
           "tts_message": "Annonseringstekst ({minutes} = gjenværende minutter)",
           "warning_media_id": "Medieinnholds-ID / URL",
           "warning_media_type": "Medieinnholdstype"
+        },
+        "data_description": {
+          "warning_threshold": "Varselet spilles av én gang når gjenværende tid faller til denne verdien.",
+          "tts_message": "La stå tomt for å bruke standardteksten på Home Assistant-språket ditt. `{minutes}` erstattes med gjenværende minutter.",
+          "warning_media_type": "For eksempel `music`. Tomt betyr `music`."
         }
       },
       "reset": {
@@ -41,6 +49,9 @@
         "description": "Tidspunktet på dagen da den daglige tellingen nullstilles.",
         "data": {
           "reset_time": "Nullstillingstidspunkt"
+        },
+        "data_description": {
+          "reset_time": "Tellere, sperre, pause og varsel tilbakestilles daglig på dette tidspunktet."
         }
       }
     },
@@ -48,7 +59,8 @@
       "player_in_use": "Minst én valgt mediespiller er allerede tildelt en annen person.",
       "no_players": "Velg minst én mediespiller.",
       "tts_entity_required": "Velg en TTS-motor når advarselsmetoden er TTS.",
-      "media_id_required": "Skriv inn en medieinnholds-ID når advarselsmetoden er Media."
+      "media_id_required": "Skriv inn en medieinnholds-ID når advarselsmetoden er Media.",
+      "name_required": "Skriv inn et navn."
     },
     "abort": {
       "already_configured": "En person med dette navnet er allerede konfigurert."
@@ -58,11 +70,14 @@
     "step": {
       "init": {
         "title": "Person og spillere",
-        "description": "Rediger navn, valgfri person-entitet og tilordnede mediespillere.",
+        "description": "Rediger navnet og de tilordnede mediespillerne. Ved navneendring beholdes eksisterende entitets-ID-er.",
         "data": {
           "name": "Navn",
-          "person_entity": "Person-entitet (valgfritt)",
           "players": "Mediespillere for denne personen"
+        },
+        "data_description": {
+          "name": "Vises som enhetsnavn og brukes av handlingene (f.eks. `Luke`). Må være unikt.",
+          "players": "Tiden telles så lenge minst én av disse spillerne er `playing`. Hver spiller kan bare tilhøre én person."
         }
       },
       "budgets": {
@@ -89,6 +104,11 @@
           "tts_message": "Annonseringstekst ({minutes} = gjenværende minutter)",
           "warning_media_id": "Medieinnholds-ID / URL",
           "warning_media_type": "Medieinnholdstype"
+        },
+        "data_description": {
+          "warning_threshold": "Varselet spilles av én gang når gjenværende tid faller til denne verdien.",
+          "tts_message": "La stå tomt for å bruke standardteksten på Home Assistant-språket ditt. `{minutes}` erstattes med gjenværende minutter.",
+          "warning_media_type": "For eksempel `music`. Tomt betyr `music`."
         }
       },
       "reset": {
@@ -96,6 +116,9 @@
         "description": "Tidspunktet på dagen da den daglige tellingen nullstilles.",
         "data": {
           "reset_time": "Nullstillingstidspunkt"
+        },
+        "data_description": {
+          "reset_time": "Tellere, sperre, pause og varsel tilbakestilles daglig på dette tidspunktet."
         }
       }
     },
@@ -103,7 +126,9 @@
       "player_in_use": "Minst én valgt mediespiller er allerede tildelt en annen person.",
       "no_players": "Velg minst én mediespiller.",
       "tts_entity_required": "Velg en TTS-motor når advarselsmetoden er TTS.",
-      "media_id_required": "Skriv inn en medieinnholds-ID når advarselsmetoden er Media."
+      "media_id_required": "Skriv inn en medieinnholds-ID når advarselsmetoden er Media.",
+      "name_required": "Skriv inn et navn.",
+      "name_in_use": "En annen person bruker allerede dette navnet."
     }
   },
   "selector": {
@@ -121,7 +146,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Navn (eller slug) på den konfigurerte personen."
+          "description": "Navn (eller slug) på den konfigurerte personen. Alternativt kan du bruke konfigurasjonsoppføringen."
+        },
+        "config_entry_id": {
+          "name": "Person (konfigurasjonsoppføring)",
+          "description": "Media Time Guard-oppføringen for personen. Forblir gyldig hvis personen får nytt navn."
         },
         "minutes": {
           "name": "Minutter",
@@ -135,7 +164,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Navn (eller slug) på den konfigurerte personen."
+          "description": "Navn (eller slug) på den konfigurerte personen. Alternativt kan du bruke konfigurasjonsoppføringen."
+        },
+        "config_entry_id": {
+          "name": "Person (konfigurasjonsoppføring)",
+          "description": "Media Time Guard-oppføringen for personen. Forblir gyldig hvis personen får nytt navn."
         },
         "suspended": {
           "name": "På pause",
@@ -149,7 +182,11 @@
       "fields": {
         "person": {
           "name": "Person",
-          "description": "Navn (eller slug) på den konfigurerte personen."
+          "description": "Navn (eller slug) på den konfigurerte personen. Alternativt kan du bruke konfigurasjonsoppføringen."
+        },
+        "config_entry_id": {
+          "name": "Person (konfigurasjonsoppføring)",
+          "description": "Media Time Guard-oppføringen for personen. Forblir gyldig hvis personen får nytt navn."
         }
       }
     }
@@ -174,6 +211,23 @@
       "extend": {
         "name": "+{minutes} min"
       }
+    }
+  },
+  "exceptions": {
+    "person_not_found": {
+      "message": "Ingen Media Time Guard-person samsvarer med «{person}»."
+    },
+    "entry_not_found": {
+      "message": "Det finnes ingen Media Time Guard-oppføring med ID «{entry_id}»."
+    },
+    "entry_not_loaded": {
+      "message": "Media Time Guard-oppføringen «{name}» er ikke lastet."
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "Media Time Guard: tilordnede entiteter mangler for {name}",
+      "description": "Disse entitetene er tilordnet **{name}**, men finnes ikke lenger: {entities}\n\nHvis du har gitt nytt navn til eller byttet ut en mediespiller eller TTS-motor, åpne **Innstillinger → Enheter og tjenester → Media Time Guard → {name} → Konfigurer** og velg de gjeldende entitetene. Manglende mediespillere blir verken telt eller stoppet."
     }
   }
 }
