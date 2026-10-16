@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from homeassistant.config_entries import ConfigEntryState
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 import voluptuous as vol
@@ -34,7 +35,7 @@ async def test_setup_and_unload(hass):
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
-    assert entry.entry_id not in hass.data.get(DOMAIN, {})
+    assert entry.state is ConfigEntryState.NOT_LOADED
 
 
 async def test_extend_time_rejects_out_of_range(hass):
@@ -53,7 +54,7 @@ async def test_extend_time_rejects_out_of_range(hass):
     await hass.services.async_call(
         DOMAIN, SERVICE_EXTEND_TIME, {"person": "Luke", "minutes": 600}, blocking=True
     )
-    guard = hass.data[DOMAIN][entry.entry_id]
+    guard = entry.runtime_data
     assert guard.data["extra_minutes_today"] == 600
 
 
@@ -63,7 +64,7 @@ async def test_unload_stops_periodic_poll(hass):
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
-    guard = hass.data[DOMAIN][entry.entry_id]
+    guard = entry.runtime_data
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()

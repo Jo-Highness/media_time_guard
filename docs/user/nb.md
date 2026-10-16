@@ -1,7 +1,8 @@
 # Media Time Guard – Brukerveiledning (Norsk bokmål)
 
 Media Time Guard begrenser en persons daglige medietid på vedkommendes mediespillere
-(f.eks. Sonos One) og håndhever grensen pålitelig – selv når barn prøver å omgå den.
+(f.eks. Sonos One) og stopper dem når dagsbudsjettet er brukt opp. Bare tilstanden `playing` på de tilordnede
+spillerne telles; andre enheter og apper dekkes ikke.
 
 ## 1. Installasjon
 
@@ -20,8 +21,7 @@ Media Time Guard begrenser en persons daglige medietid på vedkommendes mediespi
 Det opprettes én oppføring per person. Veiviseren har fire trinn:
 
 1. **Person og spillere**
-   - **Navn**: f.eks. `Luke`. (Barn har ofte ingen `person`-entitet – skriv bare navnet.)
-   - **Person-entitet** (valgfritt): hvis den finnes.
+   - **Navn**: f.eks. `Luke` (må være unikt).
    - **Mediespillere**: én eller flere. En spiller kan bare tilhøre **én** person.
 2. **Daglige budsjetter**: minutter for mandag–søndag. `0` = sperret hele dagen.
 3. **Advarsel** (valgfritt): på/av, terskel for gjenværende tid (minutter), metode:

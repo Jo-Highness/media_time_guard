@@ -3,11 +3,14 @@
     "step": {
       "user": {
         "title": "Media Time Guard – 人物",
-        "description": "1人分のメディア時間予算を作成します。可能であれば person エンティティに紐付け、なければ名前を入力してください（例: person エンティティのない子供）。",
+        "description": "1人分（通常は子供）のメディア時間予算を作成します。名前を入力し、その人が使うメディアプレーヤーを選択してください。",
         "data": {
           "name": "名前",
-          "person_entity": "person エンティティ（任意）",
           "players": "この人物のメディアプレーヤー"
+        },
+        "data_description": {
+          "name": "デバイス名として表示され、アクションでも使用されます（例: `Luke`）。重複できません。",
+          "players": "これらのプレーヤーのいずれかが `playing` の間、時間がカウントされます。各プレーヤーは1人にのみ割り当てできます。"
         }
       },
       "budgets": {
@@ -34,6 +37,11 @@
           "tts_message": "アナウンス文（{minutes} = 残り分数）",
           "warning_media_id": "メディアコンテンツID / URL",
           "warning_media_type": "メディアコンテンツ種別"
+        },
+        "data_description": {
+          "warning_threshold": "残り時間がこの値まで減ったときに、警告が1回再生されます。",
+          "tts_message": "空欄にすると Home Assistant の言語の既定テキストを使用します。`{minutes}` は残り分数に置き換えられます。",
+          "warning_media_type": "例: `music`。空欄の場合は `music`。"
         }
       },
       "reset": {
@@ -41,6 +49,9 @@
         "description": "1日のカウントをリセットする時刻。",
         "data": {
           "reset_time": "リセット時刻"
+        },
+        "data_description": {
+          "reset_time": "カウンター、ロック、一時停止、警告は毎日この時刻にリセットされます。"
         }
       }
     },
@@ -48,7 +59,8 @@
       "player_in_use": "選択したメディアプレーヤーの少なくとも1つは、すでに別の人物に割り当てられています。",
       "no_players": "メディアプレーヤーを少なくとも1つ選択してください。",
       "tts_entity_required": "警告方式が TTS の場合は TTS エンジンを選択してください。",
-      "media_id_required": "警告方式がメディアの場合はメディアコンテンツIDを入力してください。"
+      "media_id_required": "警告方式がメディアの場合はメディアコンテンツIDを入力してください。",
+      "name_required": "名前を入力してください。"
     },
     "abort": {
       "already_configured": "この名前の人物はすでに設定されています。"
@@ -58,11 +70,14 @@
     "step": {
       "init": {
         "title": "人物とプレーヤー",
-        "description": "名前、任意の person エンティティ、割り当てるメディアプレーヤーを編集します。",
+        "description": "名前と割り当てるメディアプレーヤーを編集します。名前を変更しても既存のエンティティIDは維持されます。",
         "data": {
           "name": "名前",
-          "person_entity": "person エンティティ（任意）",
           "players": "この人物のメディアプレーヤー"
+        },
+        "data_description": {
+          "name": "デバイス名として表示され、アクションでも使用されます（例: `Luke`）。重複できません。",
+          "players": "これらのプレーヤーのいずれかが `playing` の間、時間がカウントされます。各プレーヤーは1人にのみ割り当てできます。"
         }
       },
       "budgets": {
@@ -89,6 +104,11 @@
           "tts_message": "アナウンス文（{minutes} = 残り分数）",
           "warning_media_id": "メディアコンテンツID / URL",
           "warning_media_type": "メディアコンテンツ種別"
+        },
+        "data_description": {
+          "warning_threshold": "残り時間がこの値まで減ったときに、警告が1回再生されます。",
+          "tts_message": "空欄にすると Home Assistant の言語の既定テキストを使用します。`{minutes}` は残り分数に置き換えられます。",
+          "warning_media_type": "例: `music`。空欄の場合は `music`。"
         }
       },
       "reset": {
@@ -96,6 +116,9 @@
         "description": "1日のカウントをリセットする時刻。",
         "data": {
           "reset_time": "リセット時刻"
+        },
+        "data_description": {
+          "reset_time": "カウンター、ロック、一時停止、警告は毎日この時刻にリセットされます。"
         }
       }
     },
@@ -103,7 +126,9 @@
       "player_in_use": "選択したメディアプレーヤーの少なくとも1つは、すでに別の人物に割り当てられています。",
       "no_players": "メディアプレーヤーを少なくとも1つ選択してください。",
       "tts_entity_required": "警告方式が TTS の場合は TTS エンジンを選択してください。",
-      "media_id_required": "警告方式がメディアの場合はメディアコンテンツIDを入力してください。"
+      "media_id_required": "警告方式がメディアの場合はメディアコンテンツIDを入力してください。",
+      "name_required": "名前を入力してください。",
+      "name_in_use": "この名前は既に別の人物が使用しています。"
     }
   },
   "selector": {
@@ -121,7 +146,11 @@
       "fields": {
         "person": {
           "name": "人物",
-          "description": "設定済みの人物の名前（またはスラッグ）。"
+          "description": "設定済みの人物の名前（またはスラッグ）。代わりに設定エントリーも使用できます。"
+        },
+        "config_entry_id": {
+          "name": "人物（設定エントリー）",
+          "description": "その人物の Media Time Guard エントリー。名前を変更しても有効です。"
         },
         "minutes": {
           "name": "分",
@@ -135,7 +164,11 @@
       "fields": {
         "person": {
           "name": "人物",
-          "description": "設定済みの人物の名前（またはスラッグ）。"
+          "description": "設定済みの人物の名前（またはスラッグ）。代わりに設定エントリーも使用できます。"
+        },
+        "config_entry_id": {
+          "name": "人物（設定エントリー）",
+          "description": "その人物の Media Time Guard エントリー。名前を変更しても有効です。"
         },
         "suspended": {
           "name": "一時停止",
@@ -149,7 +182,11 @@
       "fields": {
         "person": {
           "name": "人物",
-          "description": "設定済みの人物の名前（またはスラッグ）。"
+          "description": "設定済みの人物の名前（またはスラッグ）。代わりに設定エントリーも使用できます。"
+        },
+        "config_entry_id": {
+          "name": "人物（設定エントリー）",
+          "description": "その人物の Media Time Guard エントリー。名前を変更しても有効です。"
         }
       }
     }
@@ -174,6 +211,23 @@
       "extend": {
         "name": "+{minutes}分"
       }
+    }
+  },
+  "exceptions": {
+    "person_not_found": {
+      "message": "「{person}」に一致する Media Time Guard の人物がいません。"
+    },
+    "entry_not_found": {
+      "message": "ID「{entry_id}」の Media Time Guard エントリーは存在しません。"
+    },
+    "entry_not_loaded": {
+      "message": "Media Time Guard エントリー「{name}」は読み込まれていません。"
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "Media Time Guard: {name} に割り当てたエンティティが見つかりません",
+      "description": "次のエンティティは **{name}** に割り当てられていますが、存在しません: {entities}\n\nメディアプレーヤーや TTS エンジンの名前を変更または交換した場合は、**設定 → デバイスとサービス → Media Time Guard → {name} → 設定** を開き、現在のエンティティを選択してください。見つからないメディアプレーヤーはカウントも停止もされません。"
     }
   }
 }

@@ -25,7 +25,7 @@ Medien-/Hörzeit von Personen** auf zugeordneten Media-Playern (primär Sonos, g
 **Out of Scope:** Inhalts-/Altersfilter, Zeitbegrenzung für Nicht-Media-Geräte, Cloud-Komponenten.
 
 ## 3. Funktionale Anforderungen
-- **FR-1 Konfiguration (nur UI):** Personen wählen (Bindung an `person`-Entitäten); je Person beliebig viele
+- **FR-1 Konfiguration (nur UI):** Personen per eindeutigem Namen anlegen (keine Bindung an `person`-Entitäten); je Person beliebig viele
   `media_player` zuordnen – **ein Player nur EINER Person** (Validierung mit Fehlermeldung).
 - **FR-2 Budgets:** je Person und Wochentag (Mo–So) Minutenbudget (0 = an dem Tag gesperrt).
 - **FR-3 Warnung (optional je Person):** Schwelle in Restminuten + Methode TTS (Engine + Ansagetext mit
@@ -35,7 +35,8 @@ Medien-/Hörzeit von Personen** auf zugeordneten Media-Playern (primär Sonos, g
   remaining/weekday/is_playing/is_locked/is_suspended/extra_minutes_today/warned_today/last_reset);
   `switch.*_suspend_today` (Aussetzen); `number.*_extend` bzw. Button/Service für Extra-Minuten; optional
   Komfort-Buttons (+15/+30).
-- **FR-6 Services:** `extend_time(person, minutes)`, `suspend_today(person, suspended)`, `reset_person(person)`
+- **FR-6 Services:** `extend_time(person, minutes)`, `suspend_today(person, suspended)`, `reset_person(person)`;
+  alternativ zu `person` optional `config_entry_id` (ab v1.2.0)
   (mit `services.yaml` + Selektoren).
 - **FR-7 Durchsetzung:** bei aufgebrauchtem Budget Wiedergabe stoppen/sperren; bei `suspend` nur informativ
   weiterzählen, kein Stoppen.
@@ -79,10 +80,11 @@ Medien-/Hörzeit von Personen** auf zugeordneten Media-Playern (primär Sonos, g
 - **A-6:** Nach HA-Neustart bleiben Tagesstände/Status erhalten.
 
 ## 11. Annahmen & offene Punkte
-- Personen werden in HA als `person` gepflegt; Sonos exemplarisch, generell media_player.
+- Personen werden über einen Namen identifiziert (eine `person`-Entität ist nicht nötig); Sonos exemplarisch, generell media_player.
 
 ## 12. Änderungshistorie
 | Version | Datum | Änderung |
 |---|---|---|
 | 1.0 | 2026-05 | Erstfassung = Ursprungsauftrag (MDs/sonosbudget.md), Code v1.0.x |
 | 1.1 | 2026-06-18 | Als Clean-Room-requirements-Doc strukturiert (Stand Code v1.0.1) |
+| 1.2 | 2026-10-16 | Ungenutzte `person`-Bindung entfernt, `config_entry_id` für Services (Stand Code v1.2.0) |

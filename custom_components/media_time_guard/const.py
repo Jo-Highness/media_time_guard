@@ -8,6 +8,8 @@ DOMAIN = "media_time_guard"
 
 # --- Config / Options keys -------------------------------------------------
 CONF_NAME = "name"
+# Legacy key from <= 1.1.x. It was never used by the runtime logic and is no
+# longer offered in the flows, but existing entries may still contain it.
 CONF_PERSON_ENTITY = "person_entity"
 CONF_PLAYERS = "players"
 CONF_BUDGETS = "budgets"  # dict weekday-index(str) -> minutes(int)
@@ -29,7 +31,18 @@ WARNING_METHODS = [WARNING_METHOD_TTS, WARNING_METHOD_MEDIA]
 DEFAULT_RESET_TIME = "00:00:00"
 DEFAULT_WARNING_THRESHOLD = 10
 DEFAULT_DAILY_MINUTES = 60
-DEFAULT_TTS_MESSAGE = "Achtung: Du hast nur noch {minutes} Minuten Medienzeit."
+# Default announcement per UI language (``hass.config.language``); English is
+# the fallback for languages without an entry.
+DEFAULT_TTS_MESSAGES: dict[str, str] = {
+    "de": "Achtung: Du hast nur noch {minutes} Minuten Medienzeit.",
+    "el": "Προσοχή: σου απομένουν μόνο {minutes} λεπτά χρόνου πολυμέσων.",
+    "en": "Heads-up: you only have {minutes} minutes of media time left.",
+    "es": "Atención: solo te quedan {minutes} minutos de tiempo multimedia.",
+    "fr": "Attention : il ne te reste que {minutes} minutes de temps multimédia.",
+    "ja": "お知らせ：メディアの時間はあと{minutes}分です。",
+    "nb": "Obs: Du har bare {minutes} minutter medietid igjen.",
+}
+DEFAULT_TTS_LANGUAGE = "en"
 DEFAULT_WARNING_MEDIA_TYPE = "music"
 
 # Weekday indices follow datetime.weekday(): Monday=0 .. Sunday=6.
@@ -61,6 +74,7 @@ SERVICE_SUSPEND_TODAY = "suspend_today"
 SERVICE_RESET_PERSON = "reset_person"
 
 ATTR_PERSON = "person"
+ATTR_CONFIG_ENTRY_ID = "config_entry_id"
 ATTR_MINUTES = "minutes"
 ATTR_SUSPENDED = "suspended"
 
@@ -80,3 +94,11 @@ ATTR_WARNED_TODAY = "warned_today"
 ATTR_LAST_RESET = "last_reset"
 ATTR_EFFECTIVE_BUDGET_MINUTES = "effective_budget_minutes"
 ATTR_PLAYERS = "players"
+
+
+def default_tts_message(language: str | None) -> str:
+    """Return the default warning text for a Home Assistant UI language."""
+    lang = (language or DEFAULT_TTS_LANGUAGE).replace("_", "-").split("-")[0].casefold()
+    if lang in ("no", "nn"):
+        lang = "nb"
+    return DEFAULT_TTS_MESSAGES.get(lang, DEFAULT_TTS_MESSAGES[DEFAULT_TTS_LANGUAGE])

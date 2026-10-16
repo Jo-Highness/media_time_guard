@@ -55,6 +55,22 @@ def build_entry_data(
     }
 
 
+async def setup_person(hass, *, options: dict | None = None, **kwargs: Any) -> MockConfigEntry:
+    """Add and set up a config entry for one person."""
+    data = build_entry_data(**kwargs)
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title=data[CONF_NAME],
+        data=data,
+        options=options or {},
+        unique_id=f"{DOMAIN}_{data[CONF_NAME].casefold()}",
+    )
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    return entry
+
+
 @pytest.fixture
 def make_guard(
     hass,

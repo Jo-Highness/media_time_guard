@@ -3,11 +3,14 @@
     "step": {
       "user": {
         "title": "Media Time Guard – Persona",
-        "description": "Crea un presupuesto de tiempo multimedia para una persona. Vincula una entidad de persona si es posible; si no, introduce solo un nombre (p. ej. para niños sin entidad de persona).",
+        "description": "Crea un presupuesto de tiempo multimedia para una persona (normalmente un niño). Introduce un nombre y elige los reproductores que usa esta persona.",
         "data": {
           "name": "Nombre",
-          "person_entity": "Entidad de persona (opcional)",
           "players": "Reproductores multimedia de esta persona"
+        },
+        "data_description": {
+          "name": "Se muestra como nombre del dispositivo y lo usan las acciones (p. ej. `Luke`). Debe ser único.",
+          "players": "El tiempo cuenta mientras al menos uno de estos reproductores esté en `playing`. Cada reproductor solo puede pertenecer a una persona."
         }
       },
       "budgets": {
@@ -34,6 +37,11 @@
           "tts_message": "Texto del anuncio ({minutes} = minutos restantes)",
           "warning_media_id": "ID de contenido multimedia / URL",
           "warning_media_type": "Tipo de contenido multimedia"
+        },
+        "data_description": {
+          "warning_threshold": "El aviso se reproduce una vez cuando el tiempo restante baja a este valor.",
+          "tts_message": "Déjalo vacío para usar el texto predeterminado en el idioma de Home Assistant. `{minutes}` se sustituye por los minutos restantes.",
+          "warning_media_type": "Por ejemplo `music`. Vacío equivale a `music`."
         }
       },
       "reset": {
@@ -41,6 +49,9 @@
         "description": "Hora del día a la que se reinicia el recuento diario.",
         "data": {
           "reset_time": "Hora de reinicio"
+        },
+        "data_description": {
+          "reset_time": "Contadores, bloqueo, suspensión y aviso se restablecen cada día a esta hora."
         }
       }
     },
@@ -48,7 +59,8 @@
       "player_in_use": "Al menos uno de los reproductores seleccionados ya está asignado a otra persona.",
       "no_players": "Selecciona al menos un reproductor multimedia.",
       "tts_entity_required": "Elige un motor TTS cuando el método de aviso sea TTS.",
-      "media_id_required": "Introduce un ID de contenido multimedia cuando el método de aviso sea Multimedia."
+      "media_id_required": "Introduce un ID de contenido multimedia cuando el método de aviso sea Multimedia.",
+      "name_required": "Introduce un nombre."
     },
     "abort": {
       "already_configured": "Ya existe una persona configurada con este nombre."
@@ -58,11 +70,14 @@
     "step": {
       "init": {
         "title": "Persona y reproductores",
-        "description": "Edita el nombre, la entidad de persona opcional y los reproductores asignados.",
+        "description": "Edita el nombre y los reproductores asignados. Al renombrar se conservan los ID de entidad existentes.",
         "data": {
           "name": "Nombre",
-          "person_entity": "Entidad de persona (opcional)",
           "players": "Reproductores multimedia de esta persona"
+        },
+        "data_description": {
+          "name": "Se muestra como nombre del dispositivo y lo usan las acciones (p. ej. `Luke`). Debe ser único.",
+          "players": "El tiempo cuenta mientras al menos uno de estos reproductores esté en `playing`. Cada reproductor solo puede pertenecer a una persona."
         }
       },
       "budgets": {
@@ -89,6 +104,11 @@
           "tts_message": "Texto del anuncio ({minutes} = minutos restantes)",
           "warning_media_id": "ID de contenido multimedia / URL",
           "warning_media_type": "Tipo de contenido multimedia"
+        },
+        "data_description": {
+          "warning_threshold": "El aviso se reproduce una vez cuando el tiempo restante baja a este valor.",
+          "tts_message": "Déjalo vacío para usar el texto predeterminado en el idioma de Home Assistant. `{minutes}` se sustituye por los minutos restantes.",
+          "warning_media_type": "Por ejemplo `music`. Vacío equivale a `music`."
         }
       },
       "reset": {
@@ -96,6 +116,9 @@
         "description": "Hora del día a la que se reinicia el recuento diario.",
         "data": {
           "reset_time": "Hora de reinicio"
+        },
+        "data_description": {
+          "reset_time": "Contadores, bloqueo, suspensión y aviso se restablecen cada día a esta hora."
         }
       }
     },
@@ -103,7 +126,9 @@
       "player_in_use": "Al menos uno de los reproductores seleccionados ya está asignado a otra persona.",
       "no_players": "Selecciona al menos un reproductor multimedia.",
       "tts_entity_required": "Elige un motor TTS cuando el método de aviso sea TTS.",
-      "media_id_required": "Introduce un ID de contenido multimedia cuando el método de aviso sea Multimedia."
+      "media_id_required": "Introduce un ID de contenido multimedia cuando el método de aviso sea Multimedia.",
+      "name_required": "Introduce un nombre.",
+      "name_in_use": "Otra persona ya usa este nombre."
     }
   },
   "selector": {
@@ -121,7 +146,11 @@
       "fields": {
         "person": {
           "name": "Persona",
-          "description": "Nombre (o slug) de la persona configurada."
+          "description": "Nombre (o slug) de la persona configurada. Como alternativa, usa la entrada de configuración."
+        },
+        "config_entry_id": {
+          "name": "Persona (entrada de configuración)",
+          "description": "La entrada de Media Time Guard de la persona. Sigue siendo válida si se renombra a la persona."
         },
         "minutes": {
           "name": "Minutos",
@@ -135,7 +164,11 @@
       "fields": {
         "person": {
           "name": "Persona",
-          "description": "Nombre (o slug) de la persona configurada."
+          "description": "Nombre (o slug) de la persona configurada. Como alternativa, usa la entrada de configuración."
+        },
+        "config_entry_id": {
+          "name": "Persona (entrada de configuración)",
+          "description": "La entrada de Media Time Guard de la persona. Sigue siendo válida si se renombra a la persona."
         },
         "suspended": {
           "name": "Suspendido",
@@ -149,7 +182,11 @@
       "fields": {
         "person": {
           "name": "Persona",
-          "description": "Nombre (o slug) de la persona configurada."
+          "description": "Nombre (o slug) de la persona configurada. Como alternativa, usa la entrada de configuración."
+        },
+        "config_entry_id": {
+          "name": "Persona (entrada de configuración)",
+          "description": "La entrada de Media Time Guard de la persona. Sigue siendo válida si se renombra a la persona."
         }
       }
     }
@@ -174,6 +211,23 @@
       "extend": {
         "name": "+{minutes} min"
       }
+    }
+  },
+  "exceptions": {
+    "person_not_found": {
+      "message": "Ninguna persona de Media Time Guard coincide con «{person}»."
+    },
+    "entry_not_found": {
+      "message": "No existe ninguna entrada de Media Time Guard con el ID «{entry_id}»."
+    },
+    "entry_not_loaded": {
+      "message": "La entrada de Media Time Guard «{name}» no está cargada."
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "Media Time Guard: faltan entidades asignadas a {name}",
+      "description": "Estas entidades están asignadas a **{name}** pero ya no existen: {entities}\n\nSi has renombrado o sustituido un reproductor o un motor TTS, abre **Ajustes → Dispositivos y servicios → Media Time Guard → {name} → Configurar** y selecciona las entidades actuales. Los reproductores que faltan no se cuentan ni se detienen."
     }
   }
 }

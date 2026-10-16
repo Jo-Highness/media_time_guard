@@ -14,7 +14,7 @@ power-cycling speakers, restarting Home Assistant, "unavailable" phases, etc.
 
 ```
 custom_components/media_time_guard/
-├── __init__.py        # setup/unload, service registration
+├── __init__.py        # async_setup (services), setup/unload, runtime_data
 ├── manifest.json      # integration metadata (config_flow, iot_class=calculated)
 ├── const.py           # keys, defaults, timings
 ├── config_flow.py     # 4-step config flow + mirrored options flow
@@ -24,13 +24,18 @@ custom_components/media_time_guard/
 ├── switch.py          # switch.media_time_<person>_suspend_today
 ├── number.py          # number.media_time_<person>_extend (absolute extra minutes)
 ├── button.py          # button.media_time_<person>_extend_15 / _extend_30
-├── services.yaml      # service descriptions + selectors
+├── diagnostics.py     # redacted config entry diagnostics
+├── icons.json         # entity and service icons
+├── services.yaml      # service fields + selectors
 ├── strings.json       # base (English) UI strings
 └── translations/      # de, en, es, fr, nb, el, ja
 ```
 
 **One config entry == one person.** Multiple people = multiple entries. Each entry owns one
-`PersonGuard` (a `DataUpdateCoordinator[dict]`) plus its entities, grouped under one device.
+`PersonGuard` (a `DataUpdateCoordinator[dict]`, stored in `entry.runtime_data`) plus its
+entities, grouped under one service device. Entities suggest the entity_id
+`<platform>.media_time_<slug>_<suffix>` when first registered; afterwards the entity registry
+keeps the ID (also across person renames). The entry's `unique_id` is never changed.
 
 ## 3. PersonGuard runtime state
 
@@ -83,7 +88,9 @@ correctly afterwards.
 
 ## 5. Enforcement (`_enforce`, tamper resistance)
 
-After every `_tick`:
+After every `_tick`, `_reevaluate_locked` first drops an existing lock if
+`used < effective_budget` (budget raised by extra minutes or via the options, which reload the
+entry and restore `is_locked` from storage). Then:
 
 - If **not suspended** and (`effective_budget <= 0` **or** `used >= effective_budget`) →
   set `is_locked = True`. `effective_budget = (weekday_budget + extra_minutes) * 60`.
@@ -98,16 +105,19 @@ Because enforcement runs on *every* state-change event **and** on the periodic p
 - A locked speaker that is switched off and on again and starts playing is **immediately
   re-stopped** — the event listener fires, and the poll is a backup.
 
-The lock is only released by: the daily reset, `extend_time`/setting extra minutes such that
-`used < new effective budget`, or `suspend_today = True`.
+The lock is only released by: the daily reset, `reset_person`, or any budget increase such
+that `used < new effective budget`. `suspend_today = True` skips enforcement while it is on.
 
 ## 6. Warning (`_maybe_warn`)
 
 When `warning_enabled`, not locked, not suspended, `not warned_today`, a player is playing and
 `0 < remaining <= threshold`: emit the warning **once** and set `warned_today = True`.
+`_rearm_warning` clears `warned_today` again when the remaining time rises above the threshold
+(budget increase), so the warning plays once more before the new end.
 
 - **TTS:** `tts.speak` with the configured TTS entity, the playing players as
-  `media_player_entity_id`, and the message template formatted with `{minutes}`.
+  `media_player_entity_id`, and the message template formatted with `{minutes}`. Without a
+  configured text the default for `hass.config.language` is used (`const.DEFAULT_TTS_MESSAGES`).
 - **Media:** `media_player.play_media` with the configured `media_content_id` / type on the
   playing players.
 
@@ -127,8 +137,20 @@ counting resumes on the first evaluation.
 Every mutating path (`_async_update_data`, event refresh, reset, `extend_time`,
 `set_extra_minutes`, `set_suspended`, `reset_person`) runs inside the per-person
 `asyncio.Lock`, eliminating races between the event listener, the poll and the reset. Service
-calls issued from the synchronous `_collect` path are scheduled via `hass.async_create_task`
-with `blocking=False`.
+calls issued from the synchronous `_collect` path run as config-entry background tasks
+(`entry.async_create_background_task`, `blocking=True` inside the task) and failures are
+logged. Event/reset refreshes are entry tasks, so they are cancelled on unload. The guard's
+`async_shutdown` (listeners + final save) runs once via the coordinator's `async_on_unload`.
+
+## 8a. Services, repairs, diagnostics
+
+- Services are registered in `async_setup` (`CONFIG_SCHEMA = config_entry_only_config_schema`)
+  and resolve the target at call time: `config_entry_id`, or `person` matched against name,
+  slug and entry title of loaded entries. Errors are translated `ServiceValidationError`s.
+- A non-fixable repair issue `missing_entities_<entry_id>` is created when an assigned player or
+  (with TTS warnings enabled) the TTS entity has neither a state nor a registry entry. Checked
+  after HA has started and on every poll; it clears itself.
+- `diagnostics.py` redacts names, entity IDs, texts and media IDs.
 
 ## 9. Validation
 

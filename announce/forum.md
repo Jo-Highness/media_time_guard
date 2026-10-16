@@ -18,7 +18,7 @@ Repo: https://github.com/Jo-Highness/media_time_guard
 
 ## What it does
 
-- **One config entry per child.** You bind the entry to a `person` entity, or just give it a name.
+- **One config entry per child.** You just give it a name.
 - **Assign that child's `media_player` entities.** The integration watches those players and adds
   up the time they spend playing.
 - **Per-weekday budgets in minutes.** Set a separate budget for each day of the week
@@ -72,7 +72,7 @@ I want to be clear about what this is and is not:
 
 ## Details
 
-- Version **1.1.0**, minimum Home Assistant **2024.11**, licensed **MIT**.
+- Version **1.2.0**, minimum Home Assistant **2025.2**, licensed **MIT**.
 - UI translated into **7 languages**: German, Greek, English, Spanish, French, Japanese, Norwegian Bokmål.
 
 ## Install

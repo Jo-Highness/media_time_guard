@@ -1,8 +1,8 @@
 # Media Time Guard – Guía de usuario (Español)
 
 Media Time Guard limita el tiempo diario de medios de una persona en sus reproductores
-(p. ej. Sonos One) y aplica el límite de forma fiable, incluso cuando los niños intentan
-saltárselo.
+(p. ej. Sonos One) y los detiene cuando se agota el presupuesto diario. Solo cuenta el estado `playing` de
+los reproductores asignados; otros dispositivos y apps no quedan cubiertos.
 
 ## 1. Instalación
 
@@ -21,8 +21,7 @@ saltárselo.
 Se crea una entrada por persona. El asistente tiene cuatro pasos:
 
 1. **Persona y reproductores**
-   - **Nombre**: p. ej. `Luke`. (Los niños a menudo no tienen entidad `person`: escribe el nombre.)
-   - **Entidad de persona** (opcional): si existe.
+   - **Nombre**: p. ej. `Luke` (debe ser único).
    - **Reproductores**: uno o varios. Un reproductor solo puede pertenecer a **una** persona.
 2. **Presupuestos diarios**: minutos de lunes a domingo. `0` = bloqueado todo el día.
 3. **Aviso** (opcional): activado/desactivado, umbral de tiempo restante (minutos), método:

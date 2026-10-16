@@ -1,0 +1,35 @@
+{
+  "entity": {
+    "sensor": {
+      "remaining": {
+        "default": "mdi:timer-music-outline"
+      }
+    },
+    "switch": {
+      "suspend_today": {
+        "default": "mdi:account-clock"
+      }
+    },
+    "number": {
+      "extra_minutes": {
+        "default": "mdi:timer-plus-outline"
+      }
+    },
+    "button": {
+      "extend": {
+        "default": "mdi:timer-plus"
+      }
+    }
+  },
+  "services": {
+    "extend_time": {
+      "service": "mdi:timer-plus"
+    },
+    "suspend_today": {
+      "service": "mdi:account-clock"
+    },
+    "reset_person": {
+      "service": "mdi:restore"
+    }
+  }
+}

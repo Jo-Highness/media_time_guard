@@ -1,4 +1,4 @@
-> 🇬🇧 [English](README.md) · 🇩🇪 [Deutsch](README.de.md) · 🇪🇸 Español (this page)
+> 🇬🇧 [English](README.md) · 🇩🇪 [Deutsch](README.de.md) · 🇪🇸 Español (esta página)
 
 <p align="center">
   <img src="icon.png" alt="Media Time Guard" width="160" height="160">
@@ -7,135 +7,224 @@
 <h1 align="center">Media Time Guard</h1>
 
 <p align="center">
-  <b>Tiempo de pantalla y audio para niños — configúralo una vez y se mantiene.</b>
+  <b>Un presupuesto diario de tiempo multimedia por niño para tus reproductores de Home Assistant: cuenta la reproducción, avisa antes del final y detiene la música cuando se acaba el tiempo.</b>
 </p>
 
-## Se acabó la negociación de "solo cinco minutos más"
+<p align="center">
+  <a href="https://github.com/hacs/integration"><img src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg" alt="HACS Custom"></a>
+  <a href="https://github.com/Jo-Highness/media_time_guard/actions/workflows/validate.yml"><img src="https://github.com/Jo-Highness/media_time_guard/actions/workflows/validate.yml/badge.svg" alt="Validate"></a>
+  <a href="https://github.com/Jo-Highness/media_time_guard/actions/workflows/test.yml"><img src="https://github.com/Jo-Highness/media_time_guard/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
+  <a href="https://github.com/Jo-Highness/media_time_guard/releases"><img src="https://img.shields.io/github/v/release/Jo-Highness/media_time_guard" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT"></a>
+  <img src="https://img.shields.io/badge/Home%20Assistant-2025.2%2B-41BDF5.svg" alt="Home Assistant 2025.2+">
+</p>
 
-**Media Time Guard** asigna a cada niño un **presupuesto diario de tiempo multimedia** y lo
-aplica **de forma automática y a prueba de manipulaciones** — en Sonos One y en **cualquier**
-otro `media_player` de Home Assistant. Cuando se agota el tiempo, la reproducción se detiene.
-¿Apagar y encender el altavoz? No sirve. ¿Reiniciar? Tampoco. Ese es justo el objetivo:
-**los niños ponen a prueba los límites; esta integración los mantiene.**
+## Inicio rápido
 
-### Por qué les encanta a los padres
+1. **Instala** con HACS: [![Abrir en HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Jo-Highness&repository=media_time_guard&category=integration) → **Descargar** → reinicia Home Assistant.
+2. **Añade** la integración: **Ajustes → Dispositivos y servicios → Añadir integración → Media Time Guard**.
+3. **Introduce un nombre** (p. ej. `Luke`), **elige los reproductores del niño** y fija los minutos por día de la semana.
+4. **Listo:** `sensor.media_time_luke_remaining` muestra ahora los minutos restantes. Inicia la reproducción en uno de los reproductores y verás la cuenta atrás; al llegar a 0, los reproductores se detienen.
 
-- ⏱️ **Un presupuesto por día de la semana** – corto entre semana, generoso el fin de semana (`0` = bloqueado ese día).
-- 🛡️ **Realmente a prueba de manipulaciones** – cuenta la reproducción real y sobrevive a reinicios, cortes de luz y trucos de apagar/encender.
-- 🔀 **Sin doble conteo** – el mismo niño en varios altavoces gasta el tiempo una sola vez.
-- 🔔 **Un aviso justo** – un **anuncio TTS** amable ("quedan 10 minutos…") o tu propio sonido antes de terminar.
-- ➕ **Recompensar es fácil** – minutos extra con botones (+15/+30), un control deslizante o un servicio.
+Repite los pasos 2–3 para cada niño (una entrada por niño).
+
+## Qué hace
+
+- ⏱️ **Un presupuesto por día de la semana** – corto entre semana, más largo el fin de semana (`0` = sin multimedia ese día).
+- ⏹️ **Detiene la reproducción cuando se agota el presupuesto** – y la vuelve a detener si se reanuda en un reproductor asignado, también tras apagar/encender el altavoz o reiniciar Home Assistant (el estado se guarda).
+- 🔀 **Sin doble conteo** – si suenan dos altavoces del niño a la vez, el tiempo cuenta una vez (tiempo de reloj).
+- 🔔 **Aviso antes del final** – un **anuncio TTS** único ("quedan 10 minutos …") o tu propio sonido.
+- ➕ **Minutos extra** – con botones (+15/+30), una entidad numérica o una acción.
 - 🤒 **Excepciones** – ¿el niño está enfermo? Suspende el control por hoy con un interruptor.
-- 🌍 **Multilingüe** – interfaz **y entidades** en español, inglés, alemán, francés (+ noruego, griego, japonés).
-- 🧩 **100 % configurable desde la interfaz, totalmente local** – sin YAML, sin automatizaciones, sin nube.
+- 🌍 **Interfaz multilingüe** – español, inglés, alemán, francés, noruego, griego y japonés.
+- 🧩 **Configuración desde la interfaz, totalmente local** – sin YAML, sin nube.
 
-Una entrada de configuración por niño: vincúlala a una entidad `person` (o simplemente
-introduce un nombre) y asigna las entidades `media_player` de esa persona. La integración
-cuenta el tiempo multimedia en esos reproductores y, cuando se agota el presupuesto del día,
-mantiene detenidos los reproductores asignados.
+### Qué se cuenta – y qué no puede controlar
+
+Solo se cuenta el tiempo en el que al menos un reproductor asignado informa el estado **`playing`**.
+`paused`, `buffering`, `idle`, `on`, `standby`, `off` y `unavailable` **no** cuentan.
+
+Ten en cuenta que es una herramienta de comodidad, no un bloqueo total:
+
+- Solo ve y detiene las entidades `media_player` asignadas. Otros dispositivos, apps que no
+  están en Home Assistant o reproductores que nunca informan `playing` (algunos televisores solo
+  informan `on`) no quedan cubiertos.
+- Para detener se usa `media_player.media_stop`; un reproductor que no lo admite o está
+  desconectado no se puede detener (los fallos se registran).
+- Cualquiera con acceso a la interfaz de Home Assistant puede dar minutos extra o suspender el control.
+- La reproducción silenciada o muy baja también cuenta, porque el reproductor está en `playing`.
+
+## Capturas de pantalla
+
+> Tomadas en una instancia de demostración con datos ficticios.
+
+| Configuración (versión 1.1 – el campo "Entidad de persona" ya no existe) | Tarjeta de entidades en uso |
+|:---:|:---:|
+| ![El formulario de configuración](images/config-flow.png) | ![Tiempo restante, minutos extra, suspensión y botones rápidos](images/dashboard.png) |
 
 ## Instalación
 
 ### HACS (recomendado)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Jo-Highness&repository=media_time_guard&category=integration)
-
-1. En **HACS** → **⋮ → Repositorios personalizados** → añade `https://github.com/Jo-Highness/media_time_guard` con la categoría **Integración** (no es necesario cuando la integración esté en la tienda por defecto: usa el botón de arriba).
-2. Busca *Media Time Guard* en HACS y **descárgalo**.
+1. Usa el botón **Abrir en HACS** de arriba o, en **HACS → ⋮ → Repositorios personalizados**, añade
+   `https://github.com/Jo-Highness/media_time_guard` con el tipo **Integración**.
+2. Busca **Media Time Guard** y **descárgalo**.
 3. **Reinicia** Home Assistant.
-4. *Ajustes → Dispositivos y servicios → Añadir integración → "Media Time Guard"*.
 
 ### Manual
 
 1. Copia `custom_components/media_time_guard/` en tu carpeta `<config>/custom_components/`.
 2. **Reinicia** Home Assistant.
-3. Añade la integración desde *Ajustes → Dispositivos y servicios*.
 
-## Configuración (una integración por niño)
+Requiere **Home Assistant 2025.2** o posterior.
 
-La configuración inicial y la edición posterior usan los mismos cuatro pasos del asistente.
-Todo se puede editar después con *Configurar* (Opciones).
+## Configuración
 
-| Paso | Qué defines |
+Una entrada **por niño**. La configuración y los cambios posteriores (**Configurar** en la entrada) usan los mismos cuatro pasos:
+
+| Paso | Qué configuras |
 |---|---|
-| **1 · Persona** | Un **nombre** (p. ej. `Luke`), una entidad **`person`** opcional y los **reproductores** asignados. Cada reproductor pertenece a una sola persona. |
-| **2 · Presupuestos diarios** | Minutos por día de la semana **lun–dom**. `0` bloquea el multimedia ese día por completo. |
-| **3 · Aviso** | Activado/desactivado, el **umbral de minutos restantes** (predeterminado `10`) y el **método**: un anuncio **TTS** (elige un motor TTS + un mensaje, donde `{minutes}` se sustituye) **o** reproducir un **medio** por su content id (con su tipo de contenido). |
-| **4 · Reinicio** | La hora del **reinicio diario** (predeterminado `00:00:00`) a la que se reinician los contadores y el aviso único. |
+| **1 · Persona** | Un **nombre** (p. ej. `Luke`, debe ser único) y los **reproductores** asignados. Cada reproductor pertenece a una sola persona. |
+| **2 · Presupuestos diarios** | Minutos para cada día **lun–dom**. `0` bloquea la multimedia todo el día. |
+| **3 · Aviso** | Activar/desactivar, el **umbral de minutos restantes** (por defecto `10`) y el **método**: un anuncio **TTS** (motor TTS + texto, `{minutes}` se sustituye; deja el texto vacío para usar el texto predeterminado en el idioma de Home Assistant) **o** un ID de contenido **multimedia** (+ tipo de contenido, por defecto `music`). |
+| **4 · Reinicio** | La **hora de reinicio** diaria (por defecto `00:00:00`). Entonces se reinician contadores, bloqueo, suspensión y aviso. |
+
+Los campos opcionales (motor TTS, texto, ID/tipo multimedia) se pueden vaciar de nuevo en las opciones.
+Si aumentas un presupuesto en las opciones, un bloqueo activo se levanta en seguida si queda tiempo.
 
 ## Entidades
 
-Cada persona configurada obtiene su propio **dispositivo** con estas entidades
-(`<person>` = el slug del nombre):
+Cada persona obtiene un **dispositivo** (con su nombre) con estas entidades. `<person>` es el
+slug del nombre en el momento de crear la entrada, p. ej. `luke`:
 
 | Entidad | Tipo | Propósito |
 |---|---|---|
-| `sensor.media_time_<person>_remaining` | sensor (medición, minutos) | Minutos multimedia restantes hoy, con atributos detallados (presupuesto, usado, día, bloqueado/suspendido, minutos extra, último reinicio). |
-| `switch.media_time_<person>_suspend_today` | interruptor | **Suspender hoy** – pausa el control por el resto del día (p. ej. el niño está enfermo). |
-| `number.media_time_<person>_extend` | número (0–600, paso 5) | **Minutos extra** para el presupuesto de hoy. |
-| `button.media_time_<person>_extend_15` | botón | Añadir rápido **+15 minutos**. |
-| `button.media_time_<person>_extend_30` | botón | Añadir rápido **+30 minutos**. |
+| `sensor.media_time_<person>_remaining` | sensor (duración, min) | Minutos restantes hoy, con atributos (ver abajo). |
+| `switch.media_time_<person>_suspend_today` | interruptor | **Suspender hoy** – sin bloqueo ni detención el resto del día (el tiempo se sigue contando). |
+| `number.media_time_<person>_extend` | número (0–600, paso 5, min) | **Minutos extra** de hoy (valor absoluto). |
+| `button.media_time_<person>_extend_15` | botón | **+15 minutos**. |
+| `button.media_time_<person>_extend_30` | botón | **+30 minutos**. |
 
-## Servicios
+Atributos del sensor: `budget_minutes`, `effective_budget_minutes`, `used_minutes`,
+`remaining_minutes`, `extra_minutes_today`, `weekday` (0 = lunes), `is_playing`, `is_locked`,
+`is_suspended`, `warned_today`, `last_reset`, `players`.
 
-Todos los servicios aceptan el **nombre o slug** de la persona.
+**ID de entidad y cambios de nombre.** Los ID de entidad se crean una vez y luego los conserva
+el registro de entidades de Home Assistant. Si **cambias el nombre de la persona** en las
+opciones, cambian el nombre del dispositivo, el título de la entrada y los *nombres* de las
+entidades, pero los *ID* se mantienen (p. ej. siguen con `…_luke_…`), así que tus
+automatizaciones siguen funcionando. Si quieres ID nuevos, cámbialos tú en los ajustes de cada entidad.
+Si **renombras o sustituyes un reproductor o una entidad TTS**, la asignación no se actualiza
+sola: Media Time Guard crea un **problema de reparación** en *Ajustes → Reparaciones*; abre
+**Configurar** en la entrada y elige la entidad actual.
 
-| Servicio | Campos | Descripción |
+## Acciones (servicios)
+
+Cada acción se dirige a una persona, con **`person`** (nombre o slug, sin distinguir
+mayúsculas) o con **`config_entry_id`** (sigue siendo válido tras cambiar el nombre). Uno de los dos es obligatorio.
+
+| Acción | Campos | Descripción |
 |---|---|---|
-| `media_time_guard.extend_time` | `person`, `minutes` (1–600) | Añade minutos multimedia extra para hoy (aumenta el presupuesto efectivo). |
-| `media_time_guard.suspend_today` | `person`, `suspended` (bool) | Suspende o reanuda el control por hoy. |
-| `media_time_guard.reset_person` | `person` | Reinicia manualmente los contadores de hoy de una persona. |
+| `media_time_guard.extend_time` | `person` / `config_entry_id`, `minutes` (1–600) | Añade minutos extra para hoy. |
+| `media_time_guard.suspend_today` | `person` / `config_entry_id`, `suspended` (bool) | Suspende o reanuda el control por hoy. |
+| `media_time_guard.reset_person` | `person` / `config_entry_id` | Reinicia contadores, bloqueo, minutos extra y suspensión de hoy. |
 
 ## Ejemplos de automatización
 
-**Recompensar 15 minutos cuando se terminan los deberes:**
+**Premiar con 15 minutos al terminar los deberes:**
 
 ```yaml
 automation:
-  - alias: "Media reward when homework done"
-    trigger:
-      - platform: state
+  - alias: "Premio multimedia al terminar los deberes"
+    triggers:
+      - trigger: state
         entity_id: input_boolean.luke_homework_done
         to: "on"
-    action:
-      - service: media_time_guard.extend_time
+    actions:
+      - action: media_time_guard.extend_time
         data:
           person: Luke
           minutes: 15
 ```
 
-**Suspender el control automáticamente un día de enfermedad:**
+**Suspender el control un día de enfermedad:**
 
 ```yaml
 automation:
-  - alias: "Suspend media limit when sick"
-    trigger:
-      - platform: state
+  - alias: "Suspender el límite multimedia si está enfermo"
+    triggers:
+      - trigger: state
         entity_id: input_boolean.luke_sick
         to: "on"
-    action:
-      - service: media_time_guard.suspend_today
+    actions:
+      - action: media_time_guard.suspend_today
         data:
           person: Luke
           suspended: true
 ```
 
-## Solución de problemas / Preguntas frecuentes
+**Notificar al móvil cuando se agota el presupuesto:**
+
+```yaml
+automation:
+  - alias: "Notificar cuando se acaba el tiempo multimedia"
+    triggers:
+      - trigger: state
+        entity_id: sensor.media_time_luke_remaining
+        attribute: is_locked
+        to: true
+    actions:
+      - action: notify.mobile_app_movil_padres
+        data:
+          message: "El tiempo multimedia de Luke para hoy se ha agotado."
+```
+
+Sustituye `notify.mobile_app_movil_padres` por tu propia acción de notificación.
+
+## Tarjeta de panel de ejemplo
+
+```yaml
+type: vertical-stack
+cards:
+  - type: gauge
+    entity: sensor.media_time_luke_remaining
+    name: Luke – tiempo multimedia restante
+    min: 0
+    max: 120
+    severity:
+      green: 30
+      yellow: 10
+      red: 0
+  - type: entities
+    entities:
+      - entity: number.media_time_luke_extend
+      - entity: switch.media_time_luke_suspend_today
+      - entity: button.media_time_luke_extend_15
+      - entity: button.media_time_luke_extend_30
+```
+
+## Solución de problemas / FAQ
 
 **La reproducción no se detiene aunque el presupuesto esté agotado.**
-Comprueba que las entidades `media_player` del niño están realmente asignadas a esa persona
-en el asistente y que el presupuesto del día actual no esté demasiado alto. `0` significa
-"bloqueado todo el día".
+Comprueba que los reproductores del niño estén asignados en la entrada, que informen `playing`
+al reproducir (ver *Herramientas para desarrolladores → Estados*) y que admitan "detener".
+Busca un problema de reparación sobre entidades que faltan. `0` minutos significa "bloqueado todo el día".
 
-**Se cuenta tiempo aunque (audiblemente) no suene nada.**
-El conteo se basa en el estado `playing` del reproductor, así que la reproducción silenciada
-o muy baja también cuenta. Es intencional y mantiene el control a prueba de manipulaciones.
+**Se cuenta tiempo aunque no se oye nada.**
+El conteo se basa en el estado `playing`, así que la reproducción silenciada también cuenta.
 
-**El mismo niño usa dos altavoces, ¿se cuenta doble?**
-No. El tiempo multimedia de una persona se cuenta una sola vez, sin importar cuántos de sus
-reproductores asignados suenen a la vez.
+**El mismo niño usa dos altavoces: ¿se cuenta dos veces?**
+No, el tiempo cuenta una vez mientras al menos un reproductor asignado esté sonando.
 
-**Activar el registro de depuración** para ver cómo se cuenta y se aplica el tiempo:
+**Un reproductor no se puede asignar a un segundo niño.**
+Es intencionado: cada `media_player` pertenece exactamente a una persona.
+
+**El aviso nunca suena.**
+Para **TTS** hace falta un motor TTS; para **multimedia**, un ID de contenido. El aviso suena
+una vez cuando el tiempo restante llega al umbral; si unos minutos extra vuelven a subir el
+tiempo restante por encima del umbral, sonará otra vez antes del nuevo final.
+
+**Activar el registro de depuración:**
 
 ```yaml
 logger:
@@ -143,14 +232,22 @@ logger:
     custom_components.media_time_guard: debug
 ```
 
-Más detalles: guías completas de usuario en [`docs/user/`](docs/user) (de, en, es, fr, nb, el, ja)
-y la arquitectura en [`docs/TECHNICAL.md`](docs/TECHNICAL.md).
+Los diagnósticos (sin nombres ni ID de entidad) se descargan desde el menú ⋮ de la entrada.
+
+Más: guías en [`docs/user/`](docs/user) (de, en, es, fr, nb, el, ja) y la arquitectura en
+[`docs/TECHNICAL.md`](docs/TECHNICAL.md).
 
 ## Contribuir
 
-Las contribuciones son bienvenidas. Lee [`CONTRIBUTING.md`](CONTRIBUTING.md) y abre una issue
-o un pull request en [GitHub](https://github.com/Jo-Highness/media_time_guard).
+Las contribuciones son bienvenidas. Lee [`CONTRIBUTING.md`](CONTRIBUTING.md) y abre un issue o
+pull request en [GitHub](https://github.com/Jo-Highness/media_time_guard).
 
 ## Licencia
 
-Publicado bajo la [Licencia MIT](LICENSE).
+Publicado bajo la [licencia MIT](LICENSE).
+
+## Créditos
+
+Creado y mantenido por [@Jo-Highness](https://github.com/Jo-Highness).
+Integración personalizada de [Home Assistant](https://www.home-assistant.io/) para
+[HACS](https://hacs.xyz/).

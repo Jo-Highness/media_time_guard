@@ -15,6 +15,9 @@ three redundant sources:
 * ``async_track_time_change`` at the configured reset time – performs the
   precise daily reset.
 
+Only the literal media-player state ``playing`` is counted; every other state
+(``paused``, ``buffering``, ``idle``, ``on``, ``off``, ``unavailable`` …) is not.
+
 All mutating paths run under a per-person ``asyncio.Lock`` to avoid races
 between events, the poll and the reset.
 """
@@ -22,12 +25,15 @@ between events, the poll and the reset.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Coroutine
 from datetime import date, datetime, time, timedelta
 import logging
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er, issue_registry as ir
 from homeassistant.helpers.event import (
     async_track_state_change_event,
     async_track_time_change,
@@ -61,7 +67,6 @@ from .const import (
     CONF_WARNING_METHOD,
     CONF_WARNING_THRESHOLD,
     DEFAULT_RESET_TIME,
-    DEFAULT_TTS_MESSAGE,
     DEFAULT_WARNING_MEDIA_TYPE,
     DEFAULT_WARNING_THRESHOLD,
     DOMAIN,
@@ -71,7 +76,11 @@ from .const import (
     STORAGE_VERSION,
     WARNING_METHOD_MEDIA,
     WARNING_METHOD_TTS,
+    default_tts_message,
 )
+
+if TYPE_CHECKING:
+    from . import MediaTimeGuardConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -85,6 +94,13 @@ TTS_DOMAIN = "tts"
 SERVICE_TTS_SPEAK = "speak"
 ATTR_MEDIA_PLAYER_ENTITY_ID = "media_player_entity_id"
 ATTR_MESSAGE = "message"
+
+ISSUE_MISSING_ENTITIES = "missing_entities"
+
+
+def missing_entities_issue_id(entry_id: str) -> str:
+    """Return the repair issue id used for ``entry_id``."""
+    return f"{ISSUE_MISSING_ENTITIES}_{entry_id}"
 
 
 def _parse_reset_time(value: str) -> time:
@@ -102,7 +118,9 @@ def _parse_reset_time(value: str) -> time:
 class PersonGuard(DataUpdateCoordinator[dict]):
     """Track and enforce media time for a single person."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+    config_entry: MediaTimeGuardConfigEntry
+
+    def __init__(self, hass: HomeAssistant, entry: MediaTimeGuardConfigEntry) -> None:
         """Initialise the guard for ``entry``."""
         self.entry = entry
         self._config = {**entry.data, **entry.options}
@@ -130,6 +148,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         # --- runtime state (transient) ---
         self._active: bool = False
         self._checkpoint: datetime | None = None
+        self._missing_entities: list[str] | None = None
 
     # ------------------------------------------------------------------
     # Config accessors
@@ -161,6 +180,15 @@ class PersonGuard(DataUpdateCoordinator[dict]):
     @property
     def warning_method(self) -> str:
         return self._config.get(CONF_WARNING_METHOD, WARNING_METHOD_TTS)
+
+    @property
+    def tts_entity(self) -> str | None:
+        return self._config.get(CONF_TTS_ENTITY) or None
+
+    @property
+    def tts_message_template(self) -> str:
+        """Configured announcement, or the default for the HA UI language."""
+        return self._config.get(CONF_TTS_MESSAGE) or default_tts_message(self.hass.config.language)
 
     def budget_minutes_for(self, weekday_index: int) -> int:
         budgets = self._config.get(CONF_BUDGETS, {}) or {}
@@ -206,7 +234,11 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         await self.async_config_entry_first_refresh()
 
     async def async_shutdown(self) -> None:
-        """Cancel listeners and flush state to disk."""
+        """Cancel listeners and flush state to disk.
+
+        Called exactly once on unload: ``DataUpdateCoordinator`` registers it
+        via ``config_entry.async_on_unload`` because we pass ``config_entry``.
+        """
         for unsub in self._unsubs:
             unsub()
         self._unsubs.clear()
@@ -310,7 +342,9 @@ class PersonGuard(DataUpdateCoordinator[dict]):
     def _collect(self, now: datetime) -> dict:
         """Advance state and return the snapshot for the entities."""
         self._tick(now)
+        self._reevaluate_locked()
         self._enforce()
+        self._rearm_warning()
         self._maybe_warn()
         self._store.async_delay_save(self._build_storage_data, 1)
         return self._snapshot()
@@ -359,13 +393,8 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             playing = self._playing_players()
             if playing:
                 _LOGGER.info("%s: locked, stopping players %s", self.person_name, playing)
-                self.hass.async_create_task(
-                    self.hass.services.async_call(
-                        MP_DOMAIN,
-                        SERVICE_MEDIA_STOP,
-                        {ATTR_ENTITY_ID: playing},
-                        blocking=False,
-                    )
+                self._call_service_in_background(
+                    MP_DOMAIN, SERVICE_MEDIA_STOP, {ATTR_ENTITY_ID: playing}
                 )
 
     def _maybe_warn(self) -> None:
@@ -396,42 +425,113 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             if not media_id:
                 _LOGGER.warning("%s: warning media id not configured", self.person_name)
                 return
-            media_type = self._config.get(CONF_WARNING_MEDIA_TYPE, DEFAULT_WARNING_MEDIA_TYPE)
-            self.hass.async_create_task(
-                self.hass.services.async_call(
-                    MP_DOMAIN,
-                    SERVICE_PLAY_MEDIA,
-                    {
-                        ATTR_ENTITY_ID: players,
-                        ATTR_MEDIA_CONTENT_ID: media_id,
-                        ATTR_MEDIA_CONTENT_TYPE: media_type,
-                    },
-                    blocking=False,
-                )
+            media_type = self._config.get(CONF_WARNING_MEDIA_TYPE) or DEFAULT_WARNING_MEDIA_TYPE
+            self._call_service_in_background(
+                MP_DOMAIN,
+                SERVICE_PLAY_MEDIA,
+                {
+                    ATTR_ENTITY_ID: players,
+                    ATTR_MEDIA_CONTENT_ID: media_id,
+                    ATTR_MEDIA_CONTENT_TYPE: media_type,
+                },
             )
             return
 
         # TTS path
-        tts_entity = self._config.get(CONF_TTS_ENTITY)
+        tts_entity = self.tts_entity
         if not tts_entity:
             _LOGGER.warning("%s: TTS entity not configured", self.person_name)
             return
-        message_template = self._config.get(CONF_TTS_MESSAGE, DEFAULT_TTS_MESSAGE)
+        message_template = self.tts_message_template
         try:
             message = message_template.format(minutes=remaining_minutes)
         except (KeyError, IndexError, ValueError):
             message = message_template
-        self.hass.async_create_task(
-            self.hass.services.async_call(
-                TTS_DOMAIN,
-                SERVICE_TTS_SPEAK,
-                {
-                    ATTR_ENTITY_ID: tts_entity,
-                    ATTR_MEDIA_PLAYER_ENTITY_ID: players,
-                    ATTR_MESSAGE: message,
-                },
-                blocking=False,
+        self._call_service_in_background(
+            TTS_DOMAIN,
+            SERVICE_TTS_SPEAK,
+            {
+                ATTR_ENTITY_ID: tts_entity,
+                ATTR_MEDIA_PLAYER_ENTITY_ID: players,
+                ATTR_MESSAGE: message,
+            },
+        )
+
+    def _call_service_in_background(self, domain: str, service: str, data: dict) -> None:
+        """Run a service call as an entry background task and log failures."""
+        self.config_entry.async_create_background_task(
+            self.hass,
+            self._async_call_service(domain, service, data),
+            f"{DOMAIN} {self.person_name} {domain}.{service}",
+        )
+
+    async def _async_call_service(self, domain: str, service: str, data: dict) -> None:
+        try:
+            await self.hass.services.async_call(domain, service, data, blocking=True)
+        except HomeAssistantError as err:
+            _LOGGER.warning(
+                "%s: calling %s.%s for %s failed: %s",
+                self.person_name,
+                domain,
+                service,
+                data.get(ATTR_ENTITY_ID),
+                err,
             )
+        except Exception:
+            _LOGGER.exception(
+                "%s: unexpected error calling %s.%s", self.person_name, domain, service
+            )
+
+    def _create_task(self, target: Coroutine[Any, Any, None], name: str) -> None:
+        """Run an internal refresh as a task bound to the config entry."""
+        self.config_entry.async_create_task(
+            self.hass, target, f"{DOMAIN} {self.person_name} {name}"
+        )
+
+    # ------------------------------------------------------------------
+    # Repairs: assigned entities that no longer exist
+    # ------------------------------------------------------------------
+    def _find_missing_entities(self) -> list[str]:
+        registry = er.async_get(self.hass)
+        candidates = list(self.players)
+        if self.warning_enabled and self.warning_method == WARNING_METHOD_TTS and self.tts_entity:
+            candidates.append(self.tts_entity)
+        return [
+            entity_id
+            for entity_id in candidates
+            if self.hass.states.get(entity_id) is None and registry.async_get(entity_id) is None
+        ]
+
+    @callback
+    def async_check_missing_entities(self) -> None:
+        """Create or clear the repair issue for missing players / TTS entity.
+
+        Only runs once Home Assistant has started, so entities that are still
+        being set up at boot are not reported.
+        """
+        if not self.hass.is_running:
+            return
+        missing = self._find_missing_entities()
+        if missing == self._missing_entities:
+            return
+        self._missing_entities = missing
+        issue_id = missing_entities_issue_id(self.config_entry.entry_id)
+        if not missing:
+            ir.async_delete_issue(self.hass, DOMAIN, issue_id)
+            return
+        _LOGGER.warning("%s: assigned entities not found: %s", self.person_name, ", ".join(missing))
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            issue_id,
+            is_fixable=False,
+            is_persistent=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key=ISSUE_MISSING_ENTITIES,
+            translation_placeholders={
+                "name": self.person_name,
+                "entities": ", ".join(missing),
+            },
         )
 
     # ------------------------------------------------------------------
@@ -459,6 +559,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
     # DataUpdateCoordinator hook (periodic poll)
     # ------------------------------------------------------------------
     async def _async_update_data(self) -> dict:
+        self.async_check_missing_entities()
         async with self._lock:
             return self._collect(dt_util.utcnow())
 
@@ -467,7 +568,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
     # ------------------------------------------------------------------
     @callback
     def _handle_state_event(self, event: Event) -> None:
-        self.hass.async_create_task(self._async_event_refresh())
+        self._create_task(self._async_event_refresh(), "state change")
 
     async def _async_event_refresh(self) -> None:
         async with self._lock:
@@ -476,7 +577,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
 
     @callback
     def _handle_reset(self, now: datetime) -> None:
-        self.hass.async_create_task(self._async_reset_refresh())
+        self._create_task(self._async_reset_refresh(), "daily reset")
 
     async def _async_reset_refresh(self) -> None:
         async with self._lock:
@@ -493,7 +594,6 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         """Add ``minutes`` of extra budget for today."""
         async with self._lock:
             self._extra_minutes = max(0, self._extra_minutes + int(minutes))
-            self._reevaluate_locked()
             data = self._collect(dt_util.utcnow())
         _LOGGER.info(
             "%s: extended by %d min (extra now %d)",
@@ -507,7 +607,6 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         """Set the absolute number of extra minutes for today."""
         async with self._lock:
             self._extra_minutes = max(0, int(minutes))
-            self._reevaluate_locked()
             data = self._collect(dt_util.utcnow())
         self.async_set_updated_data(data)
 
@@ -529,7 +628,27 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         self.async_set_updated_data(data)
 
     def _reevaluate_locked(self) -> None:
-        """Drop the lock if the (new) budget is no longer exhausted."""
+        """Drop the lock if the (new) budget is no longer exhausted.
+
+        Runs on every evaluation, so the lock is lifted after any budget
+        increase: extra minutes, a higher weekday budget via the options (the
+        entry reloads and restores ``is_locked`` from storage), etc.
+        """
         if self._is_locked and self._effective_budget_seconds > self._accumulated_seconds:
             self._is_locked = False
             _LOGGER.info("%s: budget available again -> unlocked", self.person_name)
+
+    def _rearm_warning(self) -> None:
+        """Re-arm the one-time warning once remaining time is above the threshold again.
+
+        Remaining time only grows when the budget is raised (extension or a
+        higher weekday budget), so the warning fires again before the new end.
+        """
+        if not self._warned_today:
+            return
+        remaining = self._effective_budget_seconds - self._accumulated_seconds
+        if remaining > self.warning_threshold * 60:
+            self._warned_today = False
+            _LOGGER.debug(
+                "%s: budget raised above warning threshold -> warning re-armed", self.person_name
+            )

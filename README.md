@@ -7,7 +7,7 @@
 <h1 align="center">Media Time Guard</h1>
 
 <p align="center">
-  <b>Screen &amp; speaker time for kids — set it once, and it just holds.</b>
+  <b>A daily media-time budget per child for your Home Assistant media players: counts playback, warns before the end, and stops the music when time is up.</b>
 </p>
 
 <p align="center">
@@ -16,88 +16,117 @@
   <a href="https://github.com/Jo-Highness/media_time_guard/actions/workflows/test.yml"><img src="https://github.com/Jo-Highness/media_time_guard/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
   <a href="https://github.com/Jo-Highness/media_time_guard/releases"><img src="https://img.shields.io/github/v/release/Jo-Highness/media_time_guard" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT"></a>
-  <img src="https://img.shields.io/badge/Home%20Assistant-2024.11%2B-41BDF5.svg" alt="Home Assistant 2024.11+">
+  <img src="https://img.shields.io/badge/Home%20Assistant-2025.2%2B-41BDF5.svg" alt="Home Assistant 2025.2+">
 </p>
 
-Every parent knows the scene: *"Just five more minutes!"* — for the third time.
-**Media Time Guard** gives every child a **daily media-time budget** and enforces it
-**automatically and tamper-resistantly** across your Sonos and any other Home Assistant
-`media_player`. No nagging, no timers on your phone, no loopholes. When the budget is up,
-the music stops — and turning the speaker off and on again won't buy more time.
+## Quick start
 
-## Why this exists
+1. **Install** via HACS: [![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Jo-Highness&repository=media_time_guard&category=integration) → **Download** → restart Home Assistant.
+2. **Add** the integration: **Settings → Devices & services → Add integration → Media Time Guard**.
+3. **Enter a name** (e.g. `Luke`) and **pick the child's media players**, then set the minutes per weekday.
+4. **Done:** `sensor.media_time_luke_remaining` now shows the remaining minutes. Start playback on one of the players and watch it count down — when it reaches 0, the players are stopped.
 
-- ⏱️ **A budget per weekday** – short on school days, generous on weekends (`0` = blocked that day).
-- 🛡️ **Genuinely tamper-resistant** – counts real wall-clock playback and survives restarts, power cuts and off/on tricks.
-- 🔀 **No double counting** – the same child on several speakers still spends time only once.
-- 🔔 **A fair heads-up** – a friendly **TTS announcement** ("10 minutes left…") or your own sound just before time's up.
-- ➕ **Easy to reward** – extra minutes via buttons (+15/+30), a slider, or a service call.
+Repeat step 2–3 for every child (one entry per child).
+
+## What it does
+
+- ⏱️ **A budget per weekday** – short on school days, longer at the weekend (`0` = no media that day).
+- ⏹️ **Stops playback when the budget is used up** – and stops it again if playback is restarted on an assigned player, also after a speaker power-cycle or a Home Assistant restart (the state is saved).
+- 🔀 **No double counting** – playing on two of the child's speakers at once counts once (wall-clock time).
+- 🔔 **A heads-up before the end** – a one-time **TTS announcement** ("10 minutes left …") or your own sound.
+- ➕ **Bonus minutes** – via buttons (+15/+30), a number entity or an action.
 - 🤒 **Exceptions** – child is ill? Suspend enforcement for today with one switch.
-- 🌍 **Multilingual** – UI **and entities** in English, German, Spanish, French, Norwegian, Greek and Japanese.
-- 🧩 **100 % UI-configured, fully local** – no YAML, no automations required, no cloud.
+- 🌍 **Multilingual UI** – English, German, Spanish, French, Norwegian, Greek and Japanese.
+- 🧩 **UI-configured, fully local** – no YAML, no cloud.
 
-One config entry per child: bind it to a `person` entity (or simply enter a name) and assign
-that person's `media_player` entities. The integration counts media time on those players
-and, once the day's budget is used up, keeps the assigned players stopped.
+### What counts — and what it can't control
+
+Only time in which at least one assigned player reports the state **`playing`** is counted.
+`paused`, `buffering`, `idle`, `on`, `standby`, `off` and `unavailable` are **not** counted.
+
+Keep in mind that this is a convenience tool, not a lock-down:
+
+- It only sees and stops the `media_player` entities you assign. Other devices, apps that are
+  not exposed to Home Assistant, or players that never report `playing` (some TVs only report
+  `on`) are not covered.
+- Stopping uses `media_player.media_stop`; a player that doesn't support it, or is offline,
+  can't be stopped (failures are logged).
+- Anyone with access to the Home Assistant UI can grant extra minutes or suspend enforcement.
+- Muted or very quiet playback still counts, because the player is `playing`.
 
 ## Screenshots
 
 > Captured from a demo Home Assistant with fictional data.
 
-| Setup (config flow) | Entities card in use |
+| Setup (version 1.1 – the "Person entity" field no longer exists) | Entities card in use |
 |:---:|:---:|
-| ![The UI setup form](images/config-flow.png) | ![Remaining time, extra minutes, suspend and quick-add buttons](images/dashboard.png) |
+| ![The setup form](images/config-flow.png) | ![Remaining time, extra minutes, suspend and quick-add buttons](images/dashboard.png) |
 
 ## Installation
 
 ### HACS (recommended)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Jo-Highness&repository=media_time_guard&category=integration)
-
-1. In **HACS** open **⋮ → Custom repositories** and add `https://github.com/Jo-Highness/media_time_guard` as category **Integration** (skip this step once the integration is in the default store — just use the button above).
-2. Search for **Media Time Guard** in HACS and **download** it.
+1. Click the **Open in HACS** button above, or in **HACS → ⋮ → Custom repositories** add
+   `https://github.com/Jo-Highness/media_time_guard` as type **Integration**.
+2. Search for **Media Time Guard** and **download** it.
 3. **Restart** Home Assistant.
-4. Go to **Settings → Devices & Services → Add Integration** and pick **Media Time Guard**.
 
 ### Manual
 
 1. Copy `custom_components/media_time_guard/` into your `<config>/custom_components/` folder.
 2. **Restart** Home Assistant.
-3. Add the integration from **Settings → Devices & Services**.
+
+Requires **Home Assistant 2025.2** or newer.
 
 ## Configuration
 
-Setup and later editing use the same four config-flow steps. Everything is editable afterwards
-via **Configure** (Options). Add one integration entry **per child**.
+Add one entry **per child**. Setup and later changes (**Configure** on the entry) use the same four steps:
 
 | Step | What you set |
 |---|---|
-| **1 · Person** | A **name** (e.g. `Luke`), an optional **`person` entity**, and the assigned **media players**. Each player can belong to only one person. |
-| **2 · Daily budgets** | Minutes for each weekday **Mon–Sun**. `0` blocks media entirely that day. |
-| **3 · Warning** | Enable/disable the one-time warning, its **remaining-minutes threshold** (default `10`), and the **method**: either a **TTS** announcement (choose a TTS engine + a message, where `{minutes}` is substituted) **or** playing a **media** content id (with content type). |
-| **4 · Reset** | The daily **reset time** (default `00:00:00`) at which counters and the one-time warning clear. |
+| **1 · Person** | A **name** (e.g. `Luke`, must be unique) and the assigned **media players**. Each player can belong to only one person. |
+| **2 · Daily budgets** | Minutes for each weekday **Mon–Sun**. `0` blocks media for the whole day. |
+| **3 · Warning** | On/off, the **remaining-minutes threshold** (default `10`) and the **method**: a **TTS** announcement (TTS engine + text, `{minutes}` is replaced; leave the text empty for the default in your Home Assistant language) **or** a **media** content ID (+ content type, default `music`). |
+| **4 · Reset** | The daily **reset time** (default `00:00:00`). Counters, lock, suspension and warning are reset then. |
+
+Optional fields (TTS engine, text, media ID/type) can be cleared again in the options.
+Raising a budget in the options lifts an active lock right away if time is left.
 
 ## Entities
 
-Each configured person gets its own **device** with these entities (`<person>` = the name slug):
+Each person gets a **device** (named after the person) with these entities. `<person>` is the
+slugified name at the time the entry was created, e.g. `luke`:
 
 | Entity | Type | Purpose |
 |---|---|---|
-| `sensor.media_time_<person>_remaining` | sensor (measurement, minutes) | Remaining media minutes today, with rich attributes (budget, used, weekday, locked/suspended, extra minutes, last reset). |
-| `switch.media_time_<person>_suspend_today` | switch | **Suspend today** — pause enforcement for the rest of the day (e.g. the child is ill). |
-| `number.media_time_<person>_extend` | number (0–600, step 5) | **Extra minutes** added to today's budget. |
-| `button.media_time_<person>_extend_15` | button | Quick-add **+15 minutes**. |
-| `button.media_time_<person>_extend_30` | button | Quick-add **+30 minutes**. |
+| `sensor.media_time_<person>_remaining` | sensor (duration, min) | Remaining media minutes today, with attributes (see below). |
+| `switch.media_time_<person>_suspend_today` | switch | **Suspend today** – no lock and no stopping for the rest of the day (time is still counted). |
+| `number.media_time_<person>_extend` | number (0–600, step 5, min) | **Extra minutes** for today (absolute value). |
+| `button.media_time_<person>_extend_15` | button | Add **+15 minutes**. |
+| `button.media_time_<person>_extend_30` | button | Add **+30 minutes**. |
 
-## Services
+Sensor attributes: `budget_minutes`, `effective_budget_minutes`, `used_minutes`,
+`remaining_minutes`, `extra_minutes_today`, `weekday` (0 = Monday), `is_playing`, `is_locked`,
+`is_suspended`, `warned_today`, `last_reset`, `players`.
 
-All services take the person's **name or slug**.
+**Entity IDs and renaming.** Entity IDs are created once and then kept by Home Assistant's
+entity registry. If you **rename the person** in the options, the device name, entry title and
+entity *names* change, but the entity *IDs* stay the same (e.g. still `…_luke_…`) so your
+automations keep working. To get new IDs, rename them yourself in the entity settings.
+If you **rename or replace a media player or TTS entity**, the assignment is not updated
+automatically: Media Time Guard raises a **repair issue** under *Settings → Repairs*; open
+**Configure** on the entry and select the current entity.
 
-| Service | Fields | Description |
+## Actions (services)
+
+Every action addresses one person, either with **`person`** (name or slug, case-insensitive)
+or with **`config_entry_id`** (stays valid after a rename). One of both is required.
+
+| Action | Fields | Description |
 |---|---|---|
-| `media_time_guard.extend_time` | `person`, `minutes` (1–600) | Add extra media minutes for today (raises the effective budget). |
-| `media_time_guard.suspend_today` | `person`, `suspended` (bool) | Suspend or resume enforcement for today. |
-| `media_time_guard.reset_person` | `person` | Manually reset today's counters for a person. |
+| `media_time_guard.extend_time` | `person` / `config_entry_id`, `minutes` (1–600) | Add extra minutes for today. |
+| `media_time_guard.suspend_today` | `person` / `config_entry_id`, `suspended` (bool) | Suspend or resume enforcement for today. |
+| `media_time_guard.reset_person` | `person` / `config_entry_id` | Reset today's counters, lock, extra minutes and suspension. |
 
 ## Automation examples
 
@@ -105,74 +134,96 @@ All services take the person's **name or slug**.
 
 ```yaml
 automation:
-  - alias: "Media reward when homework done"
-    trigger:
-      - platform: state
+  - alias: "Media reward when homework is done"
+    triggers:
+      - trigger: state
         entity_id: input_boolean.luke_homework_done
         to: "on"
-    action:
-      - service: media_time_guard.extend_time
+    actions:
+      - action: media_time_guard.extend_time
         data:
           person: Luke
           minutes: 15
 ```
 
-**Suspend enforcement automatically on a sick day:**
+**Suspend enforcement on a sick day:**
 
 ```yaml
 automation:
   - alias: "Suspend media limit when sick"
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: input_boolean.luke_sick
         to: "on"
-    action:
-      - service: media_time_guard.suspend_today
+    actions:
+      - action: media_time_guard.suspend_today
         data:
           person: Luke
           suspended: true
 ```
 
-**Notify your phone when the daily budget is used up:**
+**Notify your phone when the budget is used up:**
 
 ```yaml
 automation:
   - alias: "Notify when media time is up"
-    trigger:
-      - platform: numeric_state
+    triggers:
+      - trigger: state
         entity_id: sensor.media_time_luke_remaining
-        below: 1
-    action:
-      - service: notify.mobile_app_parent
+        attribute: is_locked
+        to: true
+    actions:
+      - action: notify.mobile_app_parent_phone
         data:
           message: "Luke's media time for today is used up."
+```
+
+Replace `notify.mobile_app_parent_phone` with your own notify action.
+
+## Example dashboard card
+
+```yaml
+type: vertical-stack
+cards:
+  - type: gauge
+    entity: sensor.media_time_luke_remaining
+    name: Luke – media time left
+    min: 0
+    max: 120
+    severity:
+      green: 30
+      yellow: 10
+      red: 0
+  - type: entities
+    entities:
+      - entity: number.media_time_luke_extend
+      - entity: switch.media_time_luke_suspend_today
+      - entity: button.media_time_luke_extend_15
+      - entity: button.media_time_luke_extend_30
 ```
 
 ## Troubleshooting / FAQ
 
 **Playback doesn't stop when the budget is empty.**
-Make sure the child's `media_player` entities are actually assigned to that person in the
-config flow and that the current weekday's budget isn't set to a huge value. Remember that
-`0` means "blocked all day".
+Check that the child's players are assigned in the entry, that they report `playing` while
+playing (see *Developer tools → States*) and support "stop". Look for a repair issue about
+missing entities. `0` minutes means "blocked all day".
 
-**Time counts even though nothing is (audibly) playing.**
-Counting is based on the player's `playing` state, so muted or very quiet playback still
-counts. This is intentional and keeps enforcement tamper-resistant.
+**Time counts although nothing is audible.**
+Counting is based on the `playing` state, so muted playback counts too.
 
 **The same child uses two speakers — is time counted twice?**
-No. Media time for a person is counted once, no matter how many of their assigned players
-are playing simultaneously.
+No, time is counted once while at least one assigned player is playing.
 
 **A player can't be assigned to a second child.**
-That's by design: each `media_player` belongs to exactly one person to keep the accounting
-unambiguous.
+By design: each `media_player` belongs to exactly one person.
 
 **The warning never plays.**
-Check the warning step: for the **TTS** method a TTS engine is required; for the **Media**
-method a media content id is required. The warning fires once per day, at the configured
-remaining-minutes threshold.
+For **TTS** a TTS engine is required, for **Media** a content ID. The warning plays once when
+the remaining time reaches the threshold; after bonus minutes push the remaining time above
+the threshold again, it plays once more before the new end.
 
-**Enable debug logging** to see how time is counted and enforced:
+**Enable debug logging:**
 
 ```yaml
 logger:
@@ -180,8 +231,10 @@ logger:
     custom_components.media_time_guard: debug
 ```
 
-More detail: full user guides in [`docs/user/`](docs/user) (de, en, es, fr, nb, el, ja) and
-the architecture write-up in [`docs/TECHNICAL.md`](docs/TECHNICAL.md).
+Diagnostics (without names or entity IDs) can be downloaded from the entry's ⋮ menu.
+
+More: user guides in [`docs/user/`](docs/user) (de, en, es, fr, nb, el, ja) and the
+architecture in [`docs/TECHNICAL.md`](docs/TECHNICAL.md).
 
 ## Contributing
 
