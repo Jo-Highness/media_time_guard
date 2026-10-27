@@ -14,6 +14,7 @@ from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from .const import (
+    ATTR_BLOCKED,
     ATTR_CONFIG_ENTRY_ID,
     ATTR_MINUTES,
     ATTR_PERSON,
@@ -22,6 +23,7 @@ from .const import (
     EXTRA_MINUTES_MAX,
     SERVICE_EXTEND_TIME,
     SERVICE_RESET_PERSON,
+    SERVICE_SET_BLOCKED,
     SERVICE_SUSPEND_TODAY,
 )
 from .coordinator import PersonGuard, missing_entities_issue_id
@@ -55,6 +57,10 @@ EXTEND_SCHEMA = vol.All(
 )
 SUSPEND_SCHEMA = vol.All(
     vol.Schema({**_TARGET_FIELDS, vol.Required(ATTR_SUSPENDED): cv.boolean}),
+    _REQUIRE_TARGET,
+)
+BLOCKED_SCHEMA = vol.All(
+    vol.Schema({**_TARGET_FIELDS, vol.Required(ATTR_BLOCKED): cv.boolean}),
     _REQUIRE_TARGET,
 )
 RESET_SCHEMA = vol.All(vol.Schema(_TARGET_FIELDS), _REQUIRE_TARGET)
@@ -112,12 +118,18 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async def _handle_suspend(call: ServiceCall) -> None:
         await _find_guard(hass, call).async_set_suspended(call.data[ATTR_SUSPENDED])
 
+    async def _handle_blocked(call: ServiceCall) -> None:
+        await _find_guard(hass, call).async_set_blocked(call.data[ATTR_BLOCKED])
+
     async def _handle_reset(call: ServiceCall) -> None:
         await _find_guard(hass, call).async_reset_person()
 
     hass.services.async_register(DOMAIN, SERVICE_EXTEND_TIME, _handle_extend, schema=EXTEND_SCHEMA)
     hass.services.async_register(
         DOMAIN, SERVICE_SUSPEND_TODAY, _handle_suspend, schema=SUSPEND_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_SET_BLOCKED, _handle_blocked, schema=BLOCKED_SCHEMA
     )
     hass.services.async_register(DOMAIN, SERVICE_RESET_PERSON, _handle_reset, schema=RESET_SCHEMA)
     return True

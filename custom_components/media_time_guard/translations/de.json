@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Sperren",
+      "description": "Sperrt alle Media-Player einer Person bis auf Weiteres oder hebt die Sperre wieder auf. Hat Vorrang vor Tagesbudget, Extra-Minuten und Aussetzen und übersteht den Tagesreset sowie Neustarts.",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (oder Slug) der konfigurierten Person. Alternativ den Konfigurationseintrag verwenden."
+        },
+        "config_entry_id": {
+          "name": "Person (Konfigurationseintrag)",
+          "description": "Der Media-Time-Guard-Eintrag der Person. Bleibt auch nach einer Umbenennung gültig."
+        },
+        "blocked": {
+          "name": "Gesperrt",
+          "description": "True sperrt alle Player der Person, false hebt die Sperre auf."
+        }
+      }
+    },
     "reset_person": {
       "name": "Person zurücksetzen",
       "description": "Setzt die heutigen Zähler einer Person manuell zurück.",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "Heute aussetzen"
+      },
+      "blocked": {
+        "name": "Gesperrt"
       }
     },
     "number": {

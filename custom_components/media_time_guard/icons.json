@@ -8,6 +8,12 @@
     "switch": {
       "suspend_today": {
         "default": "mdi:account-clock"
+      },
+      "blocked": {
+        "default": "mdi:speaker-off",
+        "state": {
+          "off": "mdi:speaker"
+        }
       }
     },
     "number": {
@@ -27,6 +33,9 @@
     },
     "suspend_today": {
       "service": "mdi:account-clock"
+    },
+    "set_blocked": {
+      "service": "mdi:speaker-off"
     },
     "reset_person": {
       "service": "mdi:restore"

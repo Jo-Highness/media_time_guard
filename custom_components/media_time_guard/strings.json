@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Set blocked",
+      "description": "Block or unblock all media players of a person until further notice. Takes precedence over the daily budget, extra minutes and suspension, and survives the daily reset and restarts.",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Name (or slug) of the configured person. Alternatively use the config entry."
+        },
+        "config_entry_id": {
+          "name": "Person (config entry)",
+          "description": "The Media Time Guard entry of the person. Stays valid when the person is renamed."
+        },
+        "blocked": {
+          "name": "Blocked",
+          "description": "True blocks all players of the person, false lifts the block."
+        }
+      }
+    },
     "reset_person": {
       "name": "Reset person",
       "description": "Manually reset today's counters for a person.",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "Suspend today"
+      },
+      "blocked": {
+        "name": "Blocked"
       }
     },
     "number": {

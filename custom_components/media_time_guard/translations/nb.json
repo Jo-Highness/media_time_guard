@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Set blocked",
+      "description": "Block or unblock all media players of a person until further notice. Takes precedence over the daily budget, extra minutes and suspension, and survives the daily reset and restarts.",
+      "fields": {
+        "person": {
+          "name": "Person",
+          "description": "Navn (eller slug) på den konfigurerte personen. Alternativt kan du bruke konfigurasjonsoppføringen."
+        },
+        "config_entry_id": {
+          "name": "Person (konfigurasjonsoppføring)",
+          "description": "Media Time Guard-oppføringen for personen. Forblir gyldig hvis personen får nytt navn."
+        },
+        "blocked": {
+          "name": "Blocked",
+          "description": "True blocks all players of the person, false lifts the block."
+        }
+      }
+    },
     "reset_person": {
       "name": "Nullstill person",
       "description": "Nullstill dagens tellere for en person manuelt.",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "Sett på pause i dag"
+      },
+      "blocked": {
+        "name": "Blocked"
       }
     },
     "number": {
