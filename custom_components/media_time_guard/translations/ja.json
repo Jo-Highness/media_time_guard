@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Set blocked",
+      "description": "Block or unblock all media players of a person until further notice. Takes precedence over the daily budget, extra minutes and suspension, and survives the daily reset and restarts.",
+      "fields": {
+        "person": {
+          "name": "人物",
+          "description": "設定済みの人物の名前（またはスラッグ）。代わりに設定エントリーも使用できます。"
+        },
+        "config_entry_id": {
+          "name": "人物（設定エントリー）",
+          "description": "その人物の Media Time Guard エントリー。名前を変更しても有効です。"
+        },
+        "blocked": {
+          "name": "Blocked",
+          "description": "True blocks all players of the person, false lifts the block."
+        }
+      }
+    },
     "reset_person": {
       "name": "人物をリセット",
       "description": "人物の今日のカウンターを手動でリセットします。",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "今日は一時停止"
+      },
+      "blocked": {
+        "name": "Blocked"
       }
     },
     "number": {

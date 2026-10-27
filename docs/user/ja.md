@@ -45,11 +45,12 @@ Media Time Guard は、ある人物の1日のメディア時間をその人物�
 |---|---|
 | `sensor.media_time_<person>_remaining` | 本日の残り分数 |
 | `switch.media_time_<person>_suspend_today` | 本日の強制を一時停止（例: 病気） |
+| `switch.media_time_<person>_blocked` | block all of the person's speakers until further notice |
 | `number.media_time_<person>_extend` | 本日の追加分（絶対値） |
 | `button.media_time_<person>_extend_15` / `_extend_30` | +15 / +30 分 |
 
 センサーの属性: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_locked`,
-`is_suspended`, `extra_minutes_today`, `warned_today`。
+`is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`。
 
 ## 5. よくある操作
 
@@ -57,6 +58,8 @@ Media Time Guard は、ある人物の1日のメディア時間をその人物�
   `media_time_guard.extend_time` を `person` と `minutes` で呼び出す。
 - **本日は制限なし（子供が病気）:** *Suspend Today* スイッチをオンにするか、
   `media_time_guard.suspend_today` を `suspended: true` で呼び出す。
+- **Block the speakers until further notice:** turn on the *Blocked* switch or call
+  `media_time_guard.set_blocked` with `blocked: true`.
 - **手動リセット:** `media_time_guard.reset_person` を呼び出す。
 
 ## 6. 既知の制限

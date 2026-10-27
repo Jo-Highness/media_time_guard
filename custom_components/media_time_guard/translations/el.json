@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Set blocked",
+      "description": "Block or unblock all media players of a person until further notice. Takes precedence over the daily budget, extra minutes and suspension, and survives the daily reset and restarts.",
+      "fields": {
+        "person": {
+          "name": "Άτομο",
+          "description": "Όνομα (ή slug) του ρυθμισμένου ατόμου. Εναλλακτικά χρησιμοποιήστε την καταχώριση ρύθμισης."
+        },
+        "config_entry_id": {
+          "name": "Άτομο (καταχώριση ρύθμισης)",
+          "description": "Η καταχώριση Media Time Guard του ατόμου. Παραμένει έγκυρη μετά από μετονομασία."
+        },
+        "blocked": {
+          "name": "Blocked",
+          "description": "True blocks all players of the person, false lifts the block."
+        }
+      }
+    },
     "reset_person": {
       "name": "Επαναφορά ατόμου",
       "description": "Επαναφέρει χειροκίνητα τους σημερινούς μετρητές ενός ατόμου.",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "Αναστολή σήμερα"
+      },
+      "blocked": {
+        "name": "Blocked"
       }
     },
     "number": {

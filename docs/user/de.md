@@ -45,11 +45,12 @@ Später ändern: Eintrag → **Konfigurieren**.
 |---|---|
 | `sensor.media_time_<person>_remaining` | verbleibende Minuten heute |
 | `switch.media_time_<person>_suspend_today` | Kontrolle heute aussetzen (z. B. krank) |
+| `switch.media_time_<person>_blocked` | alle Boxen der Person bis auf Weiteres sperren |
 | `number.media_time_<person>_extend` | Extra-Minuten heute (absoluter Wert) |
 | `button.media_time_<person>_extend_15` / `_extend_30` | +15 / +30 Minuten |
 
 Der Sensor liefert u. a. die Attribute `budget_minutes`, `used_minutes`, `remaining_minutes`,
-`is_locked`, `is_suspended`, `extra_minutes_today`, `warned_today`.
+`is_locked`, `is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`.
 
 ## 5. Häufige Aufgaben
 
@@ -57,6 +58,9 @@ Der Sensor liefert u. a. die Attribute `budget_minutes`, `used_minutes`, `remain
   `media_time_guard.extend_time` mit `person` und `minutes` aufrufen.
 - **Heute keine Begrenzung (Kind krank):** Schalter *Suspend Today* einschalten oder Service
   `media_time_guard.suspend_today` mit `suspended: true`.
+- **Boxen bis auf Weiteres sperren:** Schalter *Gesperrt* einschalten oder Service
+  `media_time_guard.set_blocked` mit `blocked: true`. Jede Wiedergabe wird sofort gestoppt –
+  auch über Mitternacht und Neustarts hinweg, bis der Schalter wieder aus ist.
 - **Manuell zurücksetzen:** Service `media_time_guard.reset_person`.
 
 ## 6. Hinweis / Limitierung

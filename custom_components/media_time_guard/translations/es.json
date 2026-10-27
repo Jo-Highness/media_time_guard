@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Bloquear",
+      "description": "Bloquea o desbloquea todos los reproductores multimedia de una persona hasta nuevo aviso. Tiene prioridad sobre el presupuesto diario, los minutos extra y la suspensión, y se mantiene tras el reinicio diario y los reinicios.",
+      "fields": {
+        "person": {
+          "name": "Persona",
+          "description": "Nombre (o slug) de la persona configurada. Como alternativa, usa la entrada de configuración."
+        },
+        "config_entry_id": {
+          "name": "Persona (entrada de configuración)",
+          "description": "La entrada de Media Time Guard de la persona. Sigue siendo válida si se renombra a la persona."
+        },
+        "blocked": {
+          "name": "Bloqueado",
+          "description": "True bloquea todos los reproductores de la persona, false levanta el bloqueo."
+        }
+      }
+    },
     "reset_person": {
       "name": "Reiniciar persona",
       "description": "Reinicia manualmente los contadores de hoy de una persona.",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "Suspender hoy"
+      },
+      "blocked": {
+        "name": "Bloqueado"
       }
     },
     "number": {

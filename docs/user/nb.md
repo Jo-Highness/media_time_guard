@@ -45,11 +45,12 @@ Endre senere via **Konfigurer**-knappen på oppføringen.
 |---|---|
 | `sensor.media_time_<person>_remaining` | gjenværende minutter i dag |
 | `switch.media_time_<person>_suspend_today` | sett håndheving på pause i dag (f.eks. syk) |
+| `switch.media_time_<person>_blocked` | block all of the person's speakers until further notice |
 | `number.media_time_<person>_extend` | ekstra minutter i dag (absolutt verdi) |
 | `button.media_time_<person>_extend_15` / `_extend_30` | +15 / +30 minutter |
 
 Sensorattributter: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_locked`,
-`is_suspended`, `extra_minutes_today`, `warned_today`.
+`is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`.
 
 ## 5. Vanlige oppgaver
 
@@ -57,6 +58,8 @@ Sensorattributter: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_lo
   `media_time_guard.extend_time` med `person` og `minutes`.
 - **Ingen grense i dag (barn sykt):** slå på *Suspend Today*-bryteren eller kall
   `media_time_guard.suspend_today` med `suspended: true`.
+- **Block the speakers until further notice:** turn on the *Blocked* switch or call
+  `media_time_guard.set_blocked` with `blocked: true`.
 - **Nullstill manuelt:** kall `media_time_guard.reset_person`.
 
 ## 6. Kjent begrensning

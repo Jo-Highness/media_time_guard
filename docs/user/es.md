@@ -45,11 +45,12 @@ Cámbialo más tarde con el botón **Configurar** de la entrada.
 |---|---|
 | `sensor.media_time_<persona>_remaining` | minutos restantes hoy |
 | `switch.media_time_<persona>_suspend_today` | suspender la aplicación hoy (p. ej. enfermo) |
+| `switch.media_time_<persona>_blocked` | bloquear todos los altavoces de la persona hasta nuevo aviso |
 | `number.media_time_<persona>_extend` | minutos extra hoy (valor absoluto) |
 | `button.media_time_<persona>_extend_15` / `_extend_30` | +15 / +30 minutos |
 
 Atributos del sensor: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_locked`,
-`is_suspended`, `extra_minutes_today`, `warned_today`.
+`is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`.
 
 ## 5. Tareas habituales
 
@@ -57,6 +58,9 @@ Atributos del sensor: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is
   `media_time_guard.extend_time` con `person` y `minutes`.
 - **Sin límite hoy (niño enfermo):** activa el interruptor *Suspend Today* o llama a
   `media_time_guard.suspend_today` con `suspended: true`.
+- **Bloquear los altavoces hasta nuevo aviso:** activa el interruptor *Bloqueado* o llama a
+  `media_time_guard.set_blocked` con `blocked: true`. Toda reproducción se detiene al instante,
+  también tras la medianoche y reinicios, hasta que vuelvas a apagarlo.
 - **Reiniciar manualmente:** llama a `media_time_guard.reset_person`.
 
 ## 6. Limitación conocida

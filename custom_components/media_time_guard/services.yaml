@@ -35,6 +35,22 @@ suspend_today:
       selector:
         boolean:
 
+set_blocked:
+  fields:
+    person:
+      example: Luke
+      selector:
+        text:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: media_time_guard
+    blocked:
+      required: true
+      example: true
+      selector:
+        boolean:
+
 reset_person:
   fields:
     person:

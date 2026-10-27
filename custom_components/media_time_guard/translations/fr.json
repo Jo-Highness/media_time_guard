@@ -176,6 +176,24 @@
         }
       }
     },
+    "set_blocked": {
+      "name": "Bloquer",
+      "description": "Bloque ou débloque tous les lecteurs multimédias d'une personne jusqu'à nouvel ordre. Prioritaire sur le budget quotidien, les minutes supplémentaires et la suspension, et conservé après la réinitialisation quotidienne et les redémarrages.",
+      "fields": {
+        "person": {
+          "name": "Personne",
+          "description": "Nom (ou slug) de la personne configurée. Vous pouvez aussi utiliser l'entrée de configuration."
+        },
+        "config_entry_id": {
+          "name": "Personne (entrée de configuration)",
+          "description": "L'entrée Media Time Guard de la personne. Reste valable si la personne est renommée."
+        },
+        "blocked": {
+          "name": "Bloqué",
+          "description": "True bloque tous les lecteurs de la personne, false lève le blocage."
+        }
+      }
+    },
     "reset_person": {
       "name": "Réinitialiser la personne",
       "description": "Réinitialise manuellement les compteurs du jour pour une personne.",
@@ -200,6 +218,9 @@
     "switch": {
       "suspend_today": {
         "name": "Suspendre aujourd'hui"
+      },
+      "blocked": {
+        "name": "Bloqué"
       }
     },
     "number": {

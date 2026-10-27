@@ -46,6 +46,7 @@ from .const import (
     ATTR_BUDGET_MINUTES,
     ATTR_EFFECTIVE_BUDGET_MINUTES,
     ATTR_EXTRA_MINUTES_TODAY,
+    ATTR_IS_BLOCKED,
     ATTR_IS_LOCKED,
     ATTR_IS_PLAYING,
     ATTR_IS_SUSPENDED,
@@ -141,6 +142,9 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         self._accumulated_seconds: float = 0.0
         self._is_locked: bool = False
         self._is_suspended: bool = False
+        # Permanent block "until further notice": not a daily counter, so it
+        # is deliberately left untouched by _do_reset.
+        self._is_blocked: bool = False
         self._warned_today: bool = False
         self._extra_minutes: int = 0
         self._last_reset: str | None = None
@@ -256,6 +260,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             "accumulated_seconds": round(self._accumulated_seconds, 3),
             "is_locked": self._is_locked,
             "is_suspended": self._is_suspended,
+            "is_blocked": self._is_blocked,
             "warned_today": self._warned_today,
             "extra_minutes": self._extra_minutes,
             "last_reset": self._last_reset,
@@ -271,6 +276,10 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             self._do_reset(current_media_date)
             _LOGGER.debug("%s: no stored state, starting fresh", self.person_name)
             return
+
+        # The permanent block survives the day boundary, so read it before
+        # the date check (stores from <= 1.2.x have no key -> not blocked).
+        is_blocked = bool(stored.get("is_blocked", False))
 
         stored_date_raw = stored.get("media_date")
         stored_date = date.fromisoformat(stored_date_raw) if stored_date_raw else None
@@ -300,6 +309,9 @@ class PersonGuard(DataUpdateCoordinator[dict]):
                 stored_date,
                 current_media_date,
             )
+        self._is_blocked = is_blocked
+        if is_blocked:
+            _LOGGER.debug("%s: restored permanent block", self.person_name)
 
     # ------------------------------------------------------------------
     # Media-day helpers
@@ -359,7 +371,15 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             # pre-boundary fragment and start the new day cleanly.
             _LOGGER.info("%s: media day rolled over to %s, resetting", self.person_name, media_date)
             self._do_reset(media_date)
-        elif self._active and self._checkpoint is not None:
+
+        if self._is_blocked:
+            # Blocked: nothing is counted. Drop the checkpoint so counting
+            # restarts fresh after unblocking and the block is never billed.
+            self._active = self._any_player_playing()
+            self._checkpoint = None
+            return
+
+        if self._active and self._checkpoint is not None:
             delta = (now - self._checkpoint).total_seconds()
             if delta > 0:
                 self._accumulated_seconds += delta
@@ -375,7 +395,21 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             self._checkpoint = None
 
     def _enforce(self) -> None:
-        """Lock and stop players once the budget is exhausted."""
+        """Lock and stop players once the budget is exhausted.
+
+        A permanent block takes precedence over suspension and budget: it
+        stops every playing player but leaves ``is_locked`` (budget
+        exhausted) untouched.
+        """
+        if self._is_blocked:
+            playing = self._playing_players()
+            if playing:
+                _LOGGER.info("%s: blocked, stopping players %s", self.person_name, playing)
+                self._call_service_in_background(
+                    MP_DOMAIN, SERVICE_MEDIA_STOP, {ATTR_ENTITY_ID: playing}
+                )
+            return
+
         if self._is_suspended:
             return
 
@@ -399,7 +433,13 @@ class PersonGuard(DataUpdateCoordinator[dict]):
 
     def _maybe_warn(self) -> None:
         """Emit the one-time low-time warning when appropriate."""
-        if not self.warning_enabled or self._is_locked or self._is_suspended or self._warned_today:
+        if (
+            not self.warning_enabled
+            or self._is_blocked
+            or self._is_locked
+            or self._is_suspended
+            or self._warned_today
+        ):
             return
 
         effective = self._effective_budget_seconds
@@ -549,6 +589,7 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             ATTR_IS_PLAYING: self._active,
             ATTR_IS_LOCKED: self._is_locked,
             ATTR_IS_SUSPENDED: self._is_suspended,
+            ATTR_IS_BLOCKED: self._is_blocked,
             ATTR_EXTRA_MINUTES_TODAY: self._extra_minutes,
             ATTR_WARNED_TODAY: self._warned_today,
             ATTR_LAST_RESET: self._last_reset,
@@ -616,6 +657,21 @@ class PersonGuard(DataUpdateCoordinator[dict]):
             self._is_suspended = bool(suspended)
             data = self._collect(dt_util.utcnow())
         _LOGGER.info("%s: suspended=%s", self.person_name, suspended)
+        self.async_set_updated_data(data)
+
+    async def async_set_blocked(self, blocked: bool) -> None:
+        """Block or unblock all players of the person until further notice."""
+        async with self._lock:
+            now = dt_util.utcnow()
+            # Book the time played up to now under the old flag (no-op when
+            # unblocking, as nothing is counted while blocked).
+            self._tick(now)
+            self._is_blocked = bool(blocked)
+            data = self._collect(now)
+            # Save immediately: losing a block in the delayed-save window
+            # would fail open.
+            await self._store.async_save(self._build_storage_data())
+        _LOGGER.info("%s: blocked=%s", self.person_name, blocked)
         self.async_set_updated_data(data)
 
     async def async_reset_person(self) -> None:
