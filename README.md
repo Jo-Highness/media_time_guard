@@ -101,13 +101,14 @@ slugified name at the time the entry was created, e.g. `luke`:
 |---|---|---|
 | `sensor.media_time_<person>_remaining` | sensor (duration, min) | Remaining media minutes today, with attributes (see below). |
 | `switch.media_time_<person>_suspend_today` | switch | **Suspend today** – no lock and no stopping for the rest of the day (time is still counted). |
+| `switch.media_time_<person>_blocked` | switch | **Blocked** – blocks all players of this person **until further notice**: any playback is stopped right away, regardless of the remaining time. Takes precedence over *Suspend today* and extra minutes, counts no time, sends no warning and survives the daily reset, `reset_person` and restarts. Only switching it off ends it. |
 | `number.media_time_<person>_extend` | number (0–600, step 5, min) | **Extra minutes** for today (absolute value). |
 | `button.media_time_<person>_extend_15` | button | Add **+15 minutes**. |
 | `button.media_time_<person>_extend_30` | button | Add **+30 minutes**. |
 
 Sensor attributes: `budget_minutes`, `effective_budget_minutes`, `used_minutes`,
 `remaining_minutes`, `extra_minutes_today`, `weekday` (0 = Monday), `is_playing`, `is_locked`,
-`is_suspended`, `warned_today`, `last_reset`, `players`.
+`is_suspended`, `is_blocked`, `warned_today`, `last_reset`, `players`.
 
 **Entity IDs and renaming.** Entity IDs are created once and then kept by Home Assistant's
 entity registry. If you **rename the person** in the options, the device name, entry title and
@@ -126,7 +127,8 @@ or with **`config_entry_id`** (stays valid after a rename). One of both is requi
 |---|---|---|
 | `media_time_guard.extend_time` | `person` / `config_entry_id`, `minutes` (1–600) | Add extra minutes for today. |
 | `media_time_guard.suspend_today` | `person` / `config_entry_id`, `suspended` (bool) | Suspend or resume enforcement for today. |
-| `media_time_guard.reset_person` | `person` / `config_entry_id` | Reset today's counters, lock, extra minutes and suspension. |
+| `media_time_guard.set_blocked` | `person` / `config_entry_id`, `blocked` (bool) | Block all players of the person until further notice, or lift the block. |
+| `media_time_guard.reset_person` | `person` / `config_entry_id` | Reset today's counters, lock, extra minutes and suspension (the permanent *Blocked* switch stays). |
 
 ## Automation examples
 
@@ -198,6 +200,7 @@ cards:
     entities:
       - entity: number.media_time_luke_extend
       - entity: switch.media_time_luke_suspend_today
+      - entity: switch.media_time_luke_blocked
       - entity: button.media_time_luke_extend_15
       - entity: button.media_time_luke_extend_30
 ```

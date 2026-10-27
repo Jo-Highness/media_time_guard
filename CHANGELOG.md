@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-27
+
+### Added
+
+- **Permanent block per person:** new switch `switch.media_time_<person>_blocked` ("Blocked" /
+  "Gesperrt") and action `media_time_guard.set_blocked` (`person` / `config_entry_id`, `blocked`).
+  While on, every playback on the person's players is stopped right away, regardless of the
+  remaining time. It takes precedence over *Suspend today* and extra minutes, counts no media time,
+  sends no warning, leaves `is_locked` untouched and survives the daily reset, `reset_person` and
+  restarts (saved immediately). Only switching it off ends it; afterwards the normal daily logic
+  applies again.
+- `is_blocked` attribute on the remaining-time sensor and in diagnostics.
+
 ### Fixed
 
 - hassfest: English action error messages no longer wrap placeholders in single quotes
@@ -106,7 +119,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TTS pre-warning, bonus minutes (button/slider/service) and a per-day "sick day" override switch.
 - Full config-flow setup (no YAML), coordinator, and test suite (passing on HA 2026.2).
 
-[Unreleased]: https://github.com/Jo-Highness/media_time_guard/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Jo-Highness/media_time_guard/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Jo-Highness/media_time_guard/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/Jo-Highness/media_time_guard/compare/v1.1.0...v1.1.1

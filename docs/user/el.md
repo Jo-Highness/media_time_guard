@@ -45,11 +45,12 @@
 |---|---|
 | `sensor.media_time_<άτομο>_remaining` | υπολειπόμενα λεπτά σήμερα |
 | `switch.media_time_<άτομο>_suspend_today` | αναστολή επιβολής σήμερα (π.χ. άρρωστο) |
+| `switch.media_time_<άτομο>_blocked` | block all of the person's speakers until further notice |
 | `number.media_time_<άτομο>_extend` | επιπλέον λεπτά σήμερα (απόλυτη τιμή) |
 | `button.media_time_<άτομο>_extend_15` / `_extend_30` | +15 / +30 λεπτά |
 
 Χαρακτηριστικά αισθητήρα: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_locked`,
-`is_suspended`, `extra_minutes_today`, `warned_today`.
+`is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`.
 
 ## 5. Συνήθεις εργασίες
 
@@ -57,6 +58,8 @@
   το `media_time_guard.extend_time` με `person` και `minutes`.
 - **Χωρίς όριο σήμερα (άρρωστο παιδί):** ενεργοποιήστε τον διακόπτη *Suspend Today* ή καλέστε
   το `media_time_guard.suspend_today` με `suspended: true`.
+- **Block the speakers until further notice:** turn on the *Blocked* switch or call
+  `media_time_guard.set_blocked` with `blocked: true`.
 - **Χειροκίνητη επαναφορά:** καλέστε το `media_time_guard.reset_person`.
 
 ## 6. Γνωστός περιορισμός

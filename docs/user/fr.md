@@ -45,11 +45,12 @@ Modifiez-le plus tard via le bouton **Configurer** de l'entrée.
 |---|---|
 | `sensor.media_time_<personne>_remaining` | minutes restantes aujourd'hui |
 | `switch.media_time_<personne>_suspend_today` | suspendre l'application aujourd'hui (par ex. malade) |
+| `switch.media_time_<personne>_blocked` | bloquer toutes les enceintes de la personne jusqu'à nouvel ordre |
 | `number.media_time_<personne>_extend` | minutes supplémentaires aujourd'hui (valeur absolue) |
 | `button.media_time_<personne>_extend_15` / `_extend_30` | +15 / +30 minutes |
 
 Attributs du capteur : `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_locked`,
-`is_suspended`, `extra_minutes_today`, `warned_today`.
+`is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`.
 
 ## 5. Tâches courantes
 
@@ -57,6 +58,9 @@ Attributs du capteur : `budget_minutes`, `used_minutes`, `remaining_minutes`, `i
   `media_time_guard.extend_time` avec `person` et `minutes`.
 - **Aucune limite aujourd'hui (enfant malade) :** activez l'interrupteur *Suspend Today* ou appelez
   `media_time_guard.suspend_today` avec `suspended: true`.
+- **Bloquer les enceintes jusqu'à nouvel ordre :** activez l'interrupteur *Bloqué* ou appelez
+  `media_time_guard.set_blocked` avec `blocked: true`. Toute lecture est arrêtée immédiatement,
+  même après minuit et un redémarrage, jusqu'à ce que l'interrupteur soit désactivé.
 - **Réinitialiser manuellement :** appelez `media_time_guard.reset_person`.
 
 ## 6. Limitation connue

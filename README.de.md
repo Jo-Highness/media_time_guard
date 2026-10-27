@@ -102,13 +102,14 @@ der Namens-Slug zum Zeitpunkt der Einrichtung, z. B. `luke`:
 |---|---|---|
 | `sensor.media_time_<person>_remaining` | Sensor (Dauer, min) | Restliche Medienminuten heute, mit Attributen (siehe unten). |
 | `switch.media_time_<person>_suspend_today` | Schalter | **Heute aussetzen** – für den Rest des Tages keine Sperre und kein Stoppen (die Zeit wird weiter gezählt). |
+| `switch.media_time_<person>_blocked` | Schalter | **Gesperrt** – sperrt alle Player dieser Person **bis auf Weiteres**: jede Wiedergabe wird sofort gestoppt, egal wie viel Zeit noch übrig ist. Hat Vorrang vor *Heute aussetzen* und Extra-Minuten, zählt keine Zeit, sendet keine Warnung und übersteht Tagesreset, `reset_person` und Neustarts. Endet nur durch Ausschalten. |
 | `number.media_time_<person>_extend` | Nummer (0–600, Schritt 5, min) | **Extra-Minuten** für heute (absoluter Wert). |
 | `button.media_time_<person>_extend_15` | Taster | **+15 Minuten**. |
 | `button.media_time_<person>_extend_30` | Taster | **+30 Minuten**. |
 
 Sensor-Attribute: `budget_minutes`, `effective_budget_minutes`, `used_minutes`,
 `remaining_minutes`, `extra_minutes_today`, `weekday` (0 = Montag), `is_playing`, `is_locked`,
-`is_suspended`, `warned_today`, `last_reset`, `players`.
+`is_suspended`, `is_blocked`, `warned_today`, `last_reset`, `players`.
 
 **Entitäts-IDs und Umbenennen.** Entitäts-IDs werden einmal angelegt und danach von der
 Entitäts-Registry von Home Assistant beibehalten. **Benennst du die Person** in den Optionen um,
@@ -129,7 +130,8 @@ egal) oder über **`config_entry_id`** (bleibt nach einer Umbenennung gültig). 
 |---|---|---|
 | `media_time_guard.extend_time` | `person` / `config_entry_id`, `minutes` (1–600) | Extra-Minuten für heute hinzufügen. |
 | `media_time_guard.suspend_today` | `person` / `config_entry_id`, `suspended` (bool) | Kontrolle für heute aussetzen oder fortsetzen. |
-| `media_time_guard.reset_person` | `person` / `config_entry_id` | Heutige Zähler, Sperre, Extra-Minuten und Aussetzen zurücksetzen. |
+| `media_time_guard.set_blocked` | `person` / `config_entry_id`, `blocked` (bool) | Alle Player der Person bis auf Weiteres sperren oder die Sperre aufheben. |
+| `media_time_guard.reset_person` | `person` / `config_entry_id` | Heutige Zähler, Tages-Sperre, Extra-Minuten und Aussetzen zurücksetzen (die dauerhafte Sperre *Gesperrt* bleibt). |
 
 ## Automatisierungs-Beispiele
 
@@ -201,6 +203,7 @@ cards:
     entities:
       - entity: number.media_time_luke_extend
       - entity: switch.media_time_luke_suspend_today
+      - entity: switch.media_time_luke_blocked
       - entity: button.media_time_luke_extend_15
       - entity: button.media_time_luke_extend_30
 ```

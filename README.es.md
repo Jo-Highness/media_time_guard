@@ -101,13 +101,14 @@ slug del nombre en el momento de crear la entrada, p. ej. `luke`:
 |---|---|---|
 | `sensor.media_time_<person>_remaining` | sensor (duración, min) | Minutos restantes hoy, con atributos (ver abajo). |
 | `switch.media_time_<person>_suspend_today` | interruptor | **Suspender hoy** – sin bloqueo ni detención el resto del día (el tiempo se sigue contando). |
+| `switch.media_time_<person>_blocked` | interruptor | **Bloqueado** – bloquea todos los reproductores de esta persona **hasta nuevo aviso**: cualquier reproducción se detiene de inmediato, sin importar el tiempo restante. Tiene prioridad sobre *Suspender hoy* y los minutos extra, no cuenta tiempo, no envía aviso y sobrevive al reinicio diario, a `reset_person` y a los reinicios. Solo termina al apagarlo. |
 | `number.media_time_<person>_extend` | número (0–600, paso 5, min) | **Minutos extra** de hoy (valor absoluto). |
 | `button.media_time_<person>_extend_15` | botón | **+15 minutos**. |
 | `button.media_time_<person>_extend_30` | botón | **+30 minutos**. |
 
 Atributos del sensor: `budget_minutes`, `effective_budget_minutes`, `used_minutes`,
 `remaining_minutes`, `extra_minutes_today`, `weekday` (0 = lunes), `is_playing`, `is_locked`,
-`is_suspended`, `warned_today`, `last_reset`, `players`.
+`is_suspended`, `is_blocked`, `warned_today`, `last_reset`, `players`.
 
 **ID de entidad y cambios de nombre.** Los ID de entidad se crean una vez y luego los conserva
 el registro de entidades de Home Assistant. Si **cambias el nombre de la persona** en las
@@ -127,7 +128,8 @@ mayúsculas) o con **`config_entry_id`** (sigue siendo válido tras cambiar el n
 |---|---|---|
 | `media_time_guard.extend_time` | `person` / `config_entry_id`, `minutes` (1–600) | Añade minutos extra para hoy. |
 | `media_time_guard.suspend_today` | `person` / `config_entry_id`, `suspended` (bool) | Suspende o reanuda el control por hoy. |
-| `media_time_guard.reset_person` | `person` / `config_entry_id` | Reinicia contadores, bloqueo, minutos extra y suspensión de hoy. |
+| `media_time_guard.set_blocked` | `person` / `config_entry_id`, `blocked` (bool) | Bloquea todos los reproductores de la persona hasta nuevo aviso o levanta el bloqueo. |
+| `media_time_guard.reset_person` | `person` / `config_entry_id` | Reinicia contadores, bloqueo diario, minutos extra y suspensión de hoy (el bloqueo permanente *Bloqueado* se mantiene). |
 
 ## Ejemplos de automatización
 
@@ -199,6 +201,7 @@ cards:
     entities:
       - entity: number.media_time_luke_extend
       - entity: switch.media_time_luke_suspend_today
+      - entity: switch.media_time_luke_blocked
       - entity: button.media_time_luke_extend_15
       - entity: button.media_time_luke_extend_30
 ```

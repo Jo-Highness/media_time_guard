@@ -45,11 +45,12 @@ Change later via the entry's **Configure** button.
 |---|---|
 | `sensor.media_time_<person>_remaining` | minutes left today |
 | `switch.media_time_<person>_suspend_today` | suspend enforcement today (e.g. ill) |
+| `switch.media_time_<person>_blocked` | block all of the person's speakers until further notice |
 | `number.media_time_<person>_extend` | extra minutes today (absolute value) |
 | `button.media_time_<person>_extend_15` / `_extend_30` | +15 / +30 minutes |
 
 Sensor attributes include `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_locked`,
-`is_suspended`, `extra_minutes_today`, `warned_today`.
+`is_suspended`, `is_blocked`, `extra_minutes_today`, `warned_today`.
 
 ## 5. Common tasks
 
@@ -57,6 +58,9 @@ Sensor attributes include `budget_minutes`, `used_minutes`, `remaining_minutes`,
   `media_time_guard.extend_time` with `person` and `minutes`.
 - **No limit today (child ill):** turn on the *Suspend Today* switch or call
   `media_time_guard.suspend_today` with `suspended: true`.
+- **Block the speakers until further notice:** turn on the *Blocked* switch or call
+  `media_time_guard.set_blocked` with `blocked: true`. Any playback is stopped right away –
+  across midnight and restarts – until the switch is turned off again.
 - **Reset manually:** call `media_time_guard.reset_person`.
 
 ## 6. Known limitation
