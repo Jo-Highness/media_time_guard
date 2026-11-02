@@ -56,7 +56,7 @@
       },
       "access": {
         "title": "Zugriff",
-        "description": "Wer darf die Medienzeit dieser Person ändern (verlängern, Extra-Minuten, heute frei, sperren, zurücksetzen)? Administratoren und Automationen dürfen immer.",
+        "description": "Wer darf die Medienzeit dieser Person ändern (verlängern, Extra-Minuten, heute aussetzen, sperren, zurücksetzen)? Administratoren und Automationen dürfen immer.",
         "data": {
           "restrict_changes": "Nur Administratoren und ausgewählte Benutzer dürfen ändern",
           "allowed_users": "Zusätzlich erlaubte Benutzer"
@@ -135,7 +135,7 @@
       },
       "access": {
         "title": "Zugriff",
-        "description": "Wer darf die Medienzeit dieser Person ändern (verlängern, Extra-Minuten, heute frei, sperren, zurücksetzen)? Administratoren und Automationen dürfen immer.",
+        "description": "Wer darf die Medienzeit dieser Person ändern (verlängern, Extra-Minuten, heute aussetzen, sperren, zurücksetzen)? Administratoren und Automationen dürfen immer.",
         "data": {
           "restrict_changes": "Nur Administratoren und ausgewählte Benutzer dürfen ändern",
           "allowed_users": "Zusätzlich erlaubte Benutzer"

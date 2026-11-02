@@ -213,7 +213,7 @@
           "description": "Media Time Guard-oppføringen for personen. Forblir gyldig hvis personen får nytt navn."
         },
         "blocked": {
-          "name": "Blocked",
+          "name": "Sperret",
           "description": "True blocks all players of the person, false lifts the block."
         }
       }

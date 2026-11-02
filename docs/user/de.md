@@ -73,7 +73,7 @@ weil der Player weiterhin „spielt“.
 
 Ist im Schritt **Zugriff** die Beschränkung eingeschaltet, dürfen nur noch **Administratoren**, die
 **ausgewählten Benutzer** und **Automationen** die Medienzeit dieser Person ändern (verlängern,
-Extra-Minuten, heute frei, sperren/entsperren, zurücksetzen). Alle anderen – z. B. das Konto eines
+Extra-Minuten, heute aussetzen, sperren/entsperren, zurücksetzen). Alle anderen – z. B. das Konto eines
 Wandtablets, das die Kinder bedienen – bekommen „Unauthorized“, egal ob über Dashboard, Assist oder API.
 Die Restzeit bleibt für alle sichtbar.
 

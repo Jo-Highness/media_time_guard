@@ -213,7 +213,7 @@
           "description": "Η καταχώριση Media Time Guard του ατόμου. Παραμένει έγκυρη μετά από μετονομασία."
         },
         "blocked": {
-          "name": "Blocked",
+          "name": "Αποκλεισμός",
           "description": "True blocks all players of the person, false lifts the block."
         }
       }

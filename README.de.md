@@ -99,7 +99,7 @@ Wird ein Budget in den Optionen erhöht, wird eine aktive Sperre sofort aufgehob
 Home Assistant kennt keine Rechte pro Entität. Karten im Dashboard auszublenden hindert einen angemeldeten
 Benutzer nicht daran, *+15 min* über ein anderes Dashboard, Assist oder die API zu drücken. Mit
 **Zugriff → Nur Administratoren und ausgewählte Benutzer dürfen ändern** prüft Media Time Guard **jede
-Änderung selbst** (verlängern, Extra-Minuten, heute frei, sperren/entsperren, zurücksetzen):
+Änderung selbst** (verlängern, Extra-Minuten, heute aussetzen, sperren/entsperren, zurücksetzen):
 
 | Aufrufer | Erlaubt? |
 |---|---|

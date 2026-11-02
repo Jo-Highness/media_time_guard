@@ -56,7 +56,7 @@
       },
       "access": {
         "title": "アクセス",
-        "description": "この人のメディア時間（延長、追加時間、今日は停止、ブロック、リセット）を変更できるのは誰ですか？管理者とオートメーションは常に許可されます。",
+        "description": "この人のメディア時間（延長、追加時間、今日は一時停止、ブロック、リセット）を変更できるのは誰ですか？管理者とオートメーションは常に許可されます。",
         "data": {
           "restrict_changes": "管理者と選択したユーザーのみ変更可能",
           "allowed_users": "追加で許可するユーザー"
@@ -135,7 +135,7 @@
       },
       "access": {
         "title": "アクセス",
-        "description": "この人のメディア時間（延長、追加時間、今日は停止、ブロック、リセット）を変更できるのは誰ですか？管理者とオートメーションは常に許可されます。",
+        "description": "この人のメディア時間（延長、追加時間、今日は一時停止、ブロック、リセット）を変更できるのは誰ですか？管理者とオートメーションは常に許可されます。",
         "data": {
           "restrict_changes": "管理者と選択したユーザーのみ変更可能",
           "allowed_users": "追加で許可するユーザー"
@@ -213,7 +213,7 @@
           "description": "その人物の Media Time Guard エントリー。名前を変更しても有効です。"
         },
         "blocked": {
-          "name": "Blocked",
+          "name": "ブロック中",
           "description": "True blocks all players of the person, false lifts the block."
         }
       }

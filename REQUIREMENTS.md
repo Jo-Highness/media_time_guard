@@ -97,8 +97,9 @@ zeitgesteuertes automatisches Ende der Sperre (bewusst den HA-Automationen über
   Werts ändert nichts).
 - **Schalter `switch.media_time_<slug>_blocked`:** an = gesperrt; Zustand spiegelt den persistierten Sperrstatus.
 - **Diagnostics:** enthält den Sperrstatus (`is_blocked`); die Erlaubt-Liste (Benutzer-IDs) wird geschwärzt.
-- **Berechtigungsfehler:** abgewiesene Aufrufe liefern `Unauthorized` (WebSocket/REST-Code `unauthorized`,
-  bricht aufrufende Skripte ab); Frontend zeigt die HA-Standardmeldung.
+- **Berechtigungsfehler:** abgewiesene Aufrufe lösen `Unauthorized` aus: REST antwortet mit HTTP 401,
+  WebSocket mit Fehlercode `home_assistant_error` und Meldung „Unauthorized“ (HA schreibt dazu eine ERROR-Zeile
+  ins Log); aufrufende Skripte brechen ab; das Frontend zeigt die HA-Standardmeldung.
 - **Eingang:** `media_player`-States; **Ausgang:** media_player-Stop, TTS-/Media-Play-Service.
 - **Übersetzungen:** mehrsprachige strings/translations (de, el, en, es, fr, ja, nb).
 
