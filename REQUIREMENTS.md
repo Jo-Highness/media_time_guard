@@ -4,7 +4,7 @@ typ: requirements
 version: 1.4
 status: current
 stand: 2026-11-02
-quellen: [MDs/sonosbudget.md (Ursprungsauftrag), README.md, ADR 9ba35275 (dauerhafte Sperre), QA-Suite e07cc73c, ADR f1d19c22 (Benutzerprüfung)]
+quellen: [MDs/sonosbudget.md (Ursprungsauftrag), README.md, ADR 9ba35275 (dauerhafte Sperre), QA-Suite e07cc73c, ADR f1d19c22 (Benutzerprüfung), QA-Suite cdd592b4]
 ---
 
 # Anforderungen: Media Time Guard (HA Custom Integration)
