@@ -53,6 +53,18 @@
         "data_description": {
           "reset_time": "Contadores, bloqueo, suspensión y aviso se restablecen cada día a esta hora."
         }
+      },
+      "access": {
+        "title": "Acceso",
+        "description": "¿Quién puede cambiar el tiempo multimedia de esta persona (ampliar, minutos extra, suspender, bloquear, reiniciar)? Los administradores y las automatizaciones siempre pueden.",
+        "data": {
+          "restrict_changes": "Solo administradores y usuarios seleccionados pueden cambiar",
+          "allowed_users": "Usuarios permitidos adicionalmente"
+        },
+        "data_description": {
+          "restrict_changes": "Si está activado, se rechaza a todos los demás usuarios (p. ej. la cuenta de una tableta de pared), también por la API. Desactivado: todos pueden cambiar, como antes.",
+          "allowed_users": "Usuarios sin derechos de administrador que pueden cambiar esta persona de todos modos. Se ignora mientras la restricción esté desactivada."
+        }
       }
     },
     "error": {
@@ -119,6 +131,18 @@
         },
         "data_description": {
           "reset_time": "Contadores, bloqueo, suspensión y aviso se restablecen cada día a esta hora."
+        }
+      },
+      "access": {
+        "title": "Acceso",
+        "description": "¿Quién puede cambiar el tiempo multimedia de esta persona (ampliar, minutos extra, suspender, bloquear, reiniciar)? Los administradores y las automatizaciones siempre pueden.",
+        "data": {
+          "restrict_changes": "Solo administradores y usuarios seleccionados pueden cambiar",
+          "allowed_users": "Usuarios permitidos adicionalmente"
+        },
+        "data_description": {
+          "restrict_changes": "Si está activado, se rechaza a todos los demás usuarios (p. ej. la cuenta de una tableta de pared), también por la API. Desactivado: todos pueden cambiar, como antes.",
+          "allowed_users": "Usuarios sin derechos de administrador que pueden cambiar esta persona de todos modos. Se ignora mientras la restricción esté desactivada."
         }
       }
     },

@@ -49,4 +49,4 @@ class ExtendNumber(MediaTimeGuardEntity, NumberEntity):
         return data.get(ATTR_EXTRA_MINUTES_TODAY)
 
     async def async_set_native_value(self, value: float) -> None:
-        await self.coordinator.async_set_extra_minutes(int(value))
+        await self.coordinator.async_set_extra_minutes(int(value), context=self._action_context())

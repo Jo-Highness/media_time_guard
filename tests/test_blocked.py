@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from freezegun import freeze_time
+from homeassistant.core import Context
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.storage import Store
@@ -70,7 +71,7 @@ async def test_t1_block_stops_players_with_budget_left(hass, make_guard):
         await hass.async_block_till_done(wait_background_tasks=True)
         assert len(stop_calls) == 0
 
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         await hass.async_block_till_done(wait_background_tasks=True)
         assert guard.data["is_blocked"] is True
         assert len(stop_calls) == 1
@@ -98,8 +99,8 @@ async def test_t2_block_beats_suspend(hass, make_guard):
     stop_calls = async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 10:00:00"):
         guard = await make_guard(budget_minutes=60)
-        await guard.async_set_suspended(True)
-        await guard.async_set_blocked(True)
+        await guard.async_set_suspended(True, context=Context())
+        await guard.async_set_blocked(True, context=Context())
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         await hass.async_block_till_done(wait_background_tasks=True)
@@ -112,8 +113,8 @@ async def test_t3_block_beats_extra_minutes(hass, make_guard):
     stop_calls = async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 10:00:00"):
         guard = await make_guard(budget_minutes=60)
-        await guard.async_set_blocked(True)
-        await guard.async_extend_time(30)
+        await guard.async_set_blocked(True, context=Context())
+        await guard.async_extend_time(30, context=Context())
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         await hass.async_block_till_done(wait_background_tasks=True)
@@ -130,7 +131,7 @@ async def test_t4_no_counting_while_blocked_and_no_backbilling(hass, make_guard)
     async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 10:00:00") as frozen:
         guard = await make_guard(budget_minutes=60)
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
 
         # The speaker keeps reporting "playing" (stop ignored) for 10 minutes.
         hass.states.async_set(PLAYER, "playing")
@@ -141,7 +142,7 @@ async def test_t4_no_counting_while_blocked_and_no_backbilling(hass, make_guard)
         assert guard.data["is_playing"] is True  # honest playing flag
 
         # Unblock while still playing: the blocked 10 minutes are not billed.
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(False, context=Context())
         assert guard.data["used_minutes"] == 0.0
         frozen.move_to("2026-05-29 10:12:00")
         await guard.async_refresh()
@@ -156,7 +157,7 @@ async def test_t5_time_before_block_is_booked(hass, make_guard):
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         frozen.move_to("2026-05-29 10:03:00")
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         assert guard.data["used_minutes"] == 3.0
         frozen.move_to("2026-05-29 10:20:00")
         await guard.async_refresh()
@@ -172,7 +173,7 @@ async def test_t6_no_warning_while_blocked(hass, make_guard):
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         frozen.move_to("2026-05-29 10:05:30")  # 4.5 min left: would warn now
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         await guard.async_refresh()
         await hass.async_block_till_done(wait_background_tasks=True)
         assert guard.data["warned_today"] is False
@@ -184,12 +185,12 @@ async def test_t7_block_does_not_touch_is_locked(hass, make_guard):
     async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 10:00:00"):
         guard = await make_guard(budget_minutes=0)
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         assert guard.data["is_locked"] is False
 
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(False, context=Context())
         assert guard.data["is_blocked"] is False
         assert guard.data["is_locked"] is True
 
@@ -205,9 +206,9 @@ async def test_t7_existing_lock_kept_while_blocked(hass, make_guard):
         await guard.async_refresh()
         assert guard.data["is_locked"] is True
 
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         assert guard.data["is_locked"] is True
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(False, context=Context())
         assert guard.data["is_locked"] is True
 
 
@@ -219,7 +220,7 @@ async def test_t8_block_survives_daily_reset_and_rollover(hass, make_guard):
     async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 12:00:00") as frozen:
         guard = await make_guard(budget_minutes=60)
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
 
         await guard._async_reset_refresh()
         assert guard.data["is_blocked"] is True
@@ -235,9 +236,9 @@ async def test_t9_block_survives_reset_person(hass):
     hass.states.async_set(PLAYER, "idle")
     entry = await setup_person(hass, name="Luke")
     guard = entry.runtime_data
-    await guard.async_set_blocked(True)
-    await guard.async_extend_time(20)
-    await guard.async_reset_person()
+    await guard.async_set_blocked(True, context=Context())
+    await guard.async_extend_time(20, context=Context())
+    await guard.async_reset_person(context=Context())
     assert guard.data["is_blocked"] is True
     assert guard.data["extra_minutes_today"] == 0
 
@@ -276,11 +277,11 @@ async def test_t13_block_saved_immediately(hass, hass_storage, make_guard):
     with freeze_time("2026-05-29 10:00:00"):
         guard = await make_guard(budget_minutes=60)
         key = f"{STORAGE_KEY_PREFIX}{guard.entry.entry_id}"
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         assert hass_storage[key]["data"]["is_blocked"] is True
-        await guard.async_set_blocked(True)  # idempotent
+        await guard.async_set_blocked(True, context=Context())  # idempotent
         assert guard.data["is_blocked"] is True
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(False, context=Context())
         assert hass_storage[key]["data"]["is_blocked"] is False
 
 
@@ -289,9 +290,9 @@ async def test_t14_normal_logic_after_unblock(hass, make_guard):
     stop_calls = async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 10:00:00"):
         guard = await make_guard(budget_minutes=0)
-        await guard.async_set_blocked(True)
-        await guard.async_extend_time(10)
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(True, context=Context())
+        await guard.async_extend_time(10, context=Context())
+        await guard.async_set_blocked(False, context=Context())
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         await hass.async_block_till_done(wait_background_tasks=True)
@@ -299,8 +300,8 @@ async def test_t14_normal_logic_after_unblock(hass, make_guard):
         assert guard.data["is_locked"] is False
         assert len(stop_calls) == 0
 
-        await guard.async_set_suspended(True)
-        await guard.async_set_extra_minutes(0)
+        await guard.async_set_suspended(True, context=Context())
+        await guard.async_set_extra_minutes(0, context=Context())
         await guard.async_refresh()
         await hass.async_block_till_done(wait_background_tasks=True)
         # Budget 0 but suspended -> still not enforced.
@@ -389,7 +390,7 @@ async def test_t17_attributes_diagnostics_and_reload(hass, hass_client):
     entry = await setup_person(hass, name="Luke")
     assert hass.states.get("sensor.media_time_luke_remaining").attributes["is_blocked"] is False
 
-    await entry.runtime_data.async_set_blocked(True)
+    await entry.runtime_data.async_set_blocked(True, context=Context())
     assert hass.states.get("sensor.media_time_luke_remaining").attributes["is_blocked"] is True
     diag = await get_diagnostics_for_config_entry(hass, hass_client, entry)
     assert diag["state"]["is_blocked"] is True

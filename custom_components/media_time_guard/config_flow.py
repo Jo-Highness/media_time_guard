@@ -16,11 +16,13 @@ from homeassistant.helpers import selector
 import voluptuous as vol
 
 from .const import (
+    CONF_ALLOWED_USERS,
     CONF_BUDGETS,
     CONF_NAME,
     CONF_PERSON_ENTITY,
     CONF_PLAYERS,
     CONF_RESET_TIME,
+    CONF_RESTRICT_CHANGES,
     CONF_TTS_ENTITY,
     CONF_TTS_MESSAGE,
     CONF_WARNING_ENABLED,
@@ -54,6 +56,7 @@ WARNING_STEP_KEYS = (
     CONF_WARNING_MEDIA_TYPE,
 )
 RESET_STEP_KEYS = (CONF_RESET_TIME,)
+ACCESS_STEP_KEYS = (CONF_RESTRICT_CHANGES, CONF_ALLOWED_USERS)
 
 # Shown literally in the labels/help texts of the warning step.
 WARNING_PLACEHOLDERS = {"minutes": "{minutes}"}
@@ -182,6 +185,43 @@ def _reset_schema(defaults: dict[str, Any]) -> vol.Schema:
     )
 
 
+async def _selectable_users(hass: HomeAssistant) -> list[selector.SelectOptionDict]:
+    """Users that can be granted access: active, real (not system), non-admin.
+
+    Admins are always allowed, so listing them would only be confusing.
+    """
+    users = [
+        user
+        for user in await hass.auth.async_get_users()
+        if user.is_active and not user.system_generated and not user.is_admin
+    ]
+    users.sort(key=lambda user: (user.name or "").casefold())
+    return [selector.SelectOptionDict(value=user.id, label=user.name or user.id) for user in users]
+
+
+async def _access_schema(hass: HomeAssistant, defaults: dict[str, Any]) -> vol.Schema:
+    options = await _selectable_users(hass)
+    selectable = {option["value"] for option in options}
+    # Drop users that were deleted (or became admins) since they were granted
+    # access - otherwise the stored default would fail selector validation.
+    allowed = [uid for uid in defaults.get(CONF_ALLOWED_USERS) or [] if uid in selectable]
+    return vol.Schema(
+        {
+            vol.Required(
+                CONF_RESTRICT_CHANGES,
+                default=bool(defaults.get(CONF_RESTRICT_CHANGES, False)),
+            ): selector.BooleanSelector(),
+            vol.Optional(CONF_ALLOWED_USERS, default=allowed): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=options,
+                    multiple=True,
+                    mode=selector.SelectSelectorMode.LIST,
+                )
+            ),
+        }
+    )
+
+
 def _validate_warning(data: dict[str, Any]) -> dict[str, str]:
     """Return form errors for the warning step."""
     errors: dict[str, str] = {}
@@ -269,8 +309,16 @@ class MediaTimeGuardConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_reset(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             _apply_step(self._data, user_input, RESET_STEP_KEYS)
-            return self.async_create_entry(title=self._data[CONF_NAME], data=dict(self._data))
+            return await self.async_step_access()
         return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))
+
+    async def async_step_access(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            _apply_step(self._data, user_input, ACCESS_STEP_KEYS)
+            return self.async_create_entry(title=self._data[CONF_NAME], data=dict(self._data))
+        return self.async_show_form(
+            step_id="access", data_schema=await _access_schema(self.hass, self._data)
+        )
 
     @staticmethod
     @callback
@@ -336,6 +384,12 @@ class MediaTimeGuardOptionsFlow(OptionsFlow):
     async def async_step_reset(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             _apply_step(self._data, user_input, RESET_STEP_KEYS)
+            return await self.async_step_access()
+        return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))
+
+    async def async_step_access(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            _apply_step(self._data, user_input, ACCESS_STEP_KEYS)
             # Keep the entry title in sync with the (possibly renamed) person so
             # the UI and name-based service calls match. Title and options are
             # written in one update -> exactly one reload. The unique_id stays.
@@ -343,4 +397,6 @@ class MediaTimeGuardOptionsFlow(OptionsFlow):
                 self.config_entry, title=self._data[CONF_NAME], options=dict(self._data)
             )
             return self.async_create_entry(data=dict(self._data))
-        return self.async_show_form(step_id="reset", data_schema=_reset_schema(self._data))
+        return self.async_show_form(
+            step_id="access", data_schema=await _access_schema(self.hass, self._data)
+        )

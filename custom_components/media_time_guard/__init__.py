@@ -113,16 +113,22 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Register the integration's services (once, independent of entries)."""
 
     async def _handle_extend(call: ServiceCall) -> None:
-        await _find_guard(hass, call).async_extend_time(call.data[ATTR_MINUTES])
+        await _find_guard(hass, call).async_extend_time(
+            call.data[ATTR_MINUTES], context=call.context
+        )
 
     async def _handle_suspend(call: ServiceCall) -> None:
-        await _find_guard(hass, call).async_set_suspended(call.data[ATTR_SUSPENDED])
+        await _find_guard(hass, call).async_set_suspended(
+            call.data[ATTR_SUSPENDED], context=call.context
+        )
 
     async def _handle_blocked(call: ServiceCall) -> None:
-        await _find_guard(hass, call).async_set_blocked(call.data[ATTR_BLOCKED])
+        await _find_guard(hass, call).async_set_blocked(
+            call.data[ATTR_BLOCKED], context=call.context
+        )
 
     async def _handle_reset(call: ServiceCall) -> None:
-        await _find_guard(hass, call).async_reset_person()
+        await _find_guard(hass, call).async_reset_person(context=call.context)
 
     hass.services.async_register(DOMAIN, SERVICE_EXTEND_TIME, _handle_extend, schema=EXTEND_SCHEMA)
     hass.services.async_register(

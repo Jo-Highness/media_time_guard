@@ -12,6 +12,7 @@ from custom_components.media_time_guard.const import (
     CONF_PERSON_ENTITY,
     CONF_PLAYERS,
     CONF_RESET_TIME,
+    CONF_RESTRICT_CHANGES,
     CONF_TTS_ENTITY,
     CONF_TTS_MESSAGE,
     CONF_WARNING_ENABLED,
@@ -28,7 +29,7 @@ from custom_components.media_time_guard.const import (
 from .conftest import build_entry_data, setup_person
 
 
-async def _advance_full_flow(hass, name="Luke", players=None):
+async def _advance_full_flow(hass, name="Luke", players=None, access=None):
     players = players or ["media_player.test_player"]
     result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     assert result["step_id"] == "user"
@@ -55,9 +56,13 @@ async def _advance_full_flow(hass, name="Luke", players=None):
     )
     assert result["step_id"] == "reset"
 
-    return await hass.config_entries.flow.async_configure(
+    result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
         {CONF_RESET_TIME: "00:00:00"},
+    )
+    assert result["step_id"] == "access"
+    return await hass.config_entries.flow.async_configure(
+        result["flow_id"], access or {CONF_RESTRICT_CHANGES: False}
     )
 
 
@@ -193,7 +198,7 @@ def _suggested(result, key):
 # --------------------------------------------------------------------------
 
 
-async def _run_options_flow(hass, entry, *, user=None, warning=None, reset="00:00:00"):
+async def _run_options_flow(hass, entry, *, user=None, warning=None, reset="00:00:00", access=None):
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["step_id"] == "init"
     result = await hass.config_entries.options.async_configure(
@@ -218,6 +223,10 @@ async def _run_options_flow(hass, entry, *, user=None, warning=None, reset="00:0
         return result
     result = await hass.config_entries.options.async_configure(
         result["flow_id"], {CONF_RESET_TIME: reset}
+    )
+    assert result["step_id"] == "access"
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], access or {CONF_RESTRICT_CHANGES: False}
     )
     await hass.async_block_till_done()
     return result

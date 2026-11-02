@@ -6,7 +6,7 @@ import asyncio
 import logging
 
 from freezegun import freeze_time
-from homeassistant.core import ServiceCall
+from homeassistant.core import Context, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import async_mock_service
 
@@ -24,7 +24,7 @@ async def test_e1_block_stops_all_playing_players_only(hass, make_guard):
         hass.states.async_set(PLAYER, "playing")
         hass.states.async_set(PLAYER2, "idle")
         hass.states.async_set(PLAYER3, "playing")
-        await guard.async_set_blocked(True)
+        await guard.async_set_blocked(True, context=Context())
         await hass.async_block_till_done(wait_background_tasks=True)
         assert len(stop_calls) == 1
         assert sorted(stop_calls[0].data["entity_id"]) == sorted([PLAYER, PLAYER3])
@@ -35,7 +35,7 @@ async def test_e2_real_state_event_stops_player(hass):
     stop_calls = async_mock_service(hass, "media_player", "media_stop")
     hass.states.async_set(PLAYER, "idle")
     entry = await setup_person(hass, name="Luke", budget_minutes=60)
-    await entry.runtime_data.async_set_blocked(True)
+    await entry.runtime_data.async_set_blocked(True, context=Context())
     await hass.async_block_till_done(wait_background_tasks=True)
     assert len(stop_calls) == 0
 
@@ -59,7 +59,7 @@ async def test_e3_media_stop_failure_keeps_block_and_retries(hass, make_guard, c
         guard = await make_guard(budget_minutes=60)
         hass.states.async_set(PLAYER, "playing")
         with caplog.at_level(logging.WARNING):
-            await guard.async_set_blocked(True)
+            await guard.async_set_blocked(True, context=Context())
             await hass.async_block_till_done(wait_background_tasks=True)
         assert guard.data["is_blocked"] is True
         assert len(calls) == 1
@@ -80,13 +80,13 @@ async def test_e4_unblock_with_exhausted_budget_locks_and_stops(hass, make_guard
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
         frozen.move_to("2026-05-29 10:04:00")
-        await guard.async_set_blocked(True)  # 4 of 5 min booked
+        await guard.async_set_blocked(True, context=Context())  # 4 of 5 min booked
         await hass.async_block_till_done(wait_background_tasks=True)
         assert guard.data["used_minutes"] == 4.0
         assert guard.data["is_locked"] is False
 
         frozen.move_to("2026-05-29 11:00:00")
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(False, context=Context())
         await hass.async_block_till_done(wait_background_tasks=True)
         # Still 1 minute left: counting restarts now, no lock yet.
         assert guard.data["used_minutes"] == 4.0
@@ -113,9 +113,9 @@ async def test_e5_block_over_midnight_then_unblock_fresh_day(hass, make_guard):
         frozen.move_to("2026-05-30 06:59:00")
         await guard.async_refresh()
         assert guard.data["is_locked"] is False
-        await guard.async_set_suspended(True)
-        await guard.async_extend_time(15)
-        await guard.async_set_blocked(True)
+        await guard.async_set_suspended(True, context=Context())
+        await guard.async_extend_time(15, context=Context())
+        await guard.async_set_blocked(True, context=Context())
 
         frozen.move_to("2026-05-30 07:05:00")  # local midnight passed while blocked + playing
         await guard.async_refresh()
@@ -126,7 +126,7 @@ async def test_e5_block_over_midnight_then_unblock_fresh_day(hass, make_guard):
         assert guard.data["used_minutes"] == 0.0
 
         frozen.move_to("2026-05-30 15:00:00")
-        await guard.async_set_blocked(False)
+        await guard.async_set_blocked(False, context=Context())
         frozen.move_to("2026-05-30 15:03:00")
         await guard.async_refresh()
         assert guard.data["used_minutes"] == 3.0
@@ -143,7 +143,7 @@ async def test_e6_concurrent_block_and_state_events(hass, make_guard):
         frozen.move_to("2026-05-29 10:02:00")
         await asyncio.gather(
             guard._async_event_refresh(),
-            guard.async_set_blocked(True),
+            guard.async_set_blocked(True, context=Context()),
             guard._async_event_refresh(),
             guard._async_event_refresh(),
         )

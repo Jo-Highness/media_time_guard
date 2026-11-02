@@ -31,8 +31,8 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.const import ATTR_ENTITY_ID
-from homeassistant.core import Event, HomeAssistant, callback
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.core import Context, Event, HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError, Unauthorized
 from homeassistant.helpers import entity_registry as er, issue_registry as ir
 from homeassistant.helpers.event import (
     async_track_state_change_event,
@@ -43,6 +43,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util, slugify
 
 from .const import (
+    ACTION_EXTEND_TIME,
+    ACTION_RESET_PERSON,
+    ACTION_SET_BLOCKED,
+    ACTION_SET_EXTRA_MINUTES,
+    ACTION_SET_SUSPENDED,
     ATTR_BUDGET_MINUTES,
     ATTR_EFFECTIVE_BUDGET_MINUTES,
     ATTR_EXTRA_MINUTES_TODAY,
@@ -56,10 +61,12 @@ from .const import (
     ATTR_USED_MINUTES,
     ATTR_WARNED_TODAY,
     ATTR_WEEKDAY,
+    CONF_ALLOWED_USERS,
     CONF_BUDGETS,
     CONF_NAME,
     CONF_PLAYERS,
     CONF_RESET_TIME,
+    CONF_RESTRICT_CHANGES,
     CONF_TTS_ENTITY,
     CONF_TTS_MESSAGE,
     CONF_WARNING_ENABLED,
@@ -193,6 +200,14 @@ class PersonGuard(DataUpdateCoordinator[dict]):
     def tts_message_template(self) -> str:
         """Configured announcement, or the default for the HA UI language."""
         return self._config.get(CONF_TTS_MESSAGE) or default_tts_message(self.hass.config.language)
+
+    @property
+    def restrict_changes(self) -> bool:
+        return bool(self._config.get(CONF_RESTRICT_CHANGES, False))
+
+    @property
+    def allowed_users(self) -> frozenset[str]:
+        return frozenset(self._config.get(CONF_ALLOWED_USERS) or ())
 
     def budget_minutes_for(self, weekday_index: int) -> int:
         budgets = self._config.get(CONF_BUDGETS, {}) or {}
@@ -629,10 +644,49 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         self.async_set_updated_data(data)
 
     # ------------------------------------------------------------------
-    # Public actions (services / entities)
+    # Access control
     # ------------------------------------------------------------------
-    async def async_extend_time(self, minutes: int) -> None:
+    async def _async_check_permission(self, context: Context, action: str) -> None:
+        """Raise :class:`Unauthorized` if ``context`` may not change this person.
+
+        With ``restrict_changes`` enabled only these callers are allowed:
+        calls without a user (automations, time triggers, the system), active
+        admins and the active users listed in ``allowed_users``. Unknown or
+        inactive users are refused (fail closed). Admins are always allowed
+        because they can switch the restriction off anyway.
+        """
+        if not self.restrict_changes:
+            return
+        user_id = context.user_id
+        if user_id is None:
+            return
+        user = await self.hass.auth.async_get_user(user_id)
+        if user is not None and user.is_active and (user.is_admin or user_id in self.allowed_users):
+            return
+        _LOGGER.warning(
+            "%s: %s refused for user %s (%s) - not allowed to change media time",
+            self.person_name,
+            action,
+            user.name if user is not None else "<unknown>",
+            user_id,
+        )
+        raise Unauthorized(
+            context=context,
+            user_id=user_id,
+            config_entry_id=self.entry.entry_id,
+            permission=action,
+        )
+
+    # ------------------------------------------------------------------
+    # Public actions (services / entities)
+    #
+    # Every action takes the caller's ``context`` as a mandatory keyword so
+    # no write path can skip the permission check (checked before any state
+    # is touched).
+    # ------------------------------------------------------------------
+    async def async_extend_time(self, minutes: int, *, context: Context) -> None:
         """Add ``minutes`` of extra budget for today."""
+        await self._async_check_permission(context, ACTION_EXTEND_TIME)
         async with self._lock:
             self._extra_minutes = max(0, self._extra_minutes + int(minutes))
             data = self._collect(dt_util.utcnow())
@@ -644,23 +698,26 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         )
         self.async_set_updated_data(data)
 
-    async def async_set_extra_minutes(self, minutes: int) -> None:
+    async def async_set_extra_minutes(self, minutes: int, *, context: Context) -> None:
         """Set the absolute number of extra minutes for today."""
+        await self._async_check_permission(context, ACTION_SET_EXTRA_MINUTES)
         async with self._lock:
             self._extra_minutes = max(0, int(minutes))
             data = self._collect(dt_util.utcnow())
         self.async_set_updated_data(data)
 
-    async def async_set_suspended(self, suspended: bool) -> None:
+    async def async_set_suspended(self, suspended: bool, *, context: Context) -> None:
         """Suspend or resume enforcement for today."""
+        await self._async_check_permission(context, ACTION_SET_SUSPENDED)
         async with self._lock:
             self._is_suspended = bool(suspended)
             data = self._collect(dt_util.utcnow())
         _LOGGER.info("%s: suspended=%s", self.person_name, suspended)
         self.async_set_updated_data(data)
 
-    async def async_set_blocked(self, blocked: bool) -> None:
+    async def async_set_blocked(self, blocked: bool, *, context: Context) -> None:
         """Block or unblock all players of the person until further notice."""
+        await self._async_check_permission(context, ACTION_SET_BLOCKED)
         async with self._lock:
             now = dt_util.utcnow()
             # Book the time played up to now under the old flag (no-op when
@@ -674,8 +731,9 @@ class PersonGuard(DataUpdateCoordinator[dict]):
         _LOGGER.info("%s: blocked=%s", self.person_name, blocked)
         self.async_set_updated_data(data)
 
-    async def async_reset_person(self) -> None:
+    async def async_reset_person(self, *, context: Context) -> None:
         """Manually reset the daily counters."""
+        await self._async_check_permission(context, ACTION_RESET_PERSON)
         async with self._lock:
             now = dt_util.utcnow()
             self._do_reset(self._current_media_date(dt_util.as_local(now)))

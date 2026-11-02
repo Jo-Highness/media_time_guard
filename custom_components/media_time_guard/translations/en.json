@@ -53,6 +53,18 @@
         "data_description": {
           "reset_time": "Counters, lock, suspension and warning are reset daily at this time."
         }
+      },
+      "access": {
+        "title": "Access",
+        "description": "Who may change the media time of this person (extend, extra minutes, suspend, block, reset)? Admins and automations are always allowed.",
+        "data": {
+          "restrict_changes": "Only admins and selected users may change",
+          "allowed_users": "Additionally allowed users"
+        },
+        "data_description": {
+          "restrict_changes": "When on, all other users (e.g. a wall tablet's account) are refused - also via the API. Off: everyone may change, as before.",
+          "allowed_users": "Non-admin users who may change this person anyway. Ignored while the restriction is off."
+        }
       }
     },
     "error": {
@@ -119,6 +131,18 @@
         },
         "data_description": {
           "reset_time": "Counters, lock, suspension and warning are reset daily at this time."
+        }
+      },
+      "access": {
+        "title": "Access",
+        "description": "Who may change the media time of this person (extend, extra minutes, suspend, block, reset)? Admins and automations are always allowed.",
+        "data": {
+          "restrict_changes": "Only admins and selected users may change",
+          "allowed_users": "Additionally allowed users"
+        },
+        "data_description": {
+          "restrict_changes": "When on, all other users (e.g. a wall tablet's account) are refused - also via the API. Off: everyone may change, as before.",
+          "allowed_users": "Non-admin users who may change this person anyway. Ignored while the restriction is off."
         }
       }
     },

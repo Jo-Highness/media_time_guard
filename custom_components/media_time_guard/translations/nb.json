@@ -53,6 +53,18 @@
         "data_description": {
           "reset_time": "Tellere, sperre, pause og varsel tilbakestilles daglig på dette tidspunktet."
         }
+      },
+      "access": {
+        "title": "Tilgang",
+        "description": "Hvem kan endre medietiden til denne personen (forlenge, ekstra minutter, pause, sperre, tilbakestille)? Administratorer og automatiseringer har alltid lov.",
+        "data": {
+          "restrict_changes": "Bare administratorer og valgte brukere kan endre",
+          "allowed_users": "Brukere som i tillegg har lov"
+        },
+        "data_description": {
+          "restrict_changes": "Når på, avvises alle andre brukere (f.eks. kontoen til et nettbrett på veggen) – også via API-et. Av: alle kan endre, som før.",
+          "allowed_users": "Brukere uten administratorrettigheter som likevel kan endre denne personen. Ignoreres så lenge begrensningen er av."
+        }
       }
     },
     "error": {
@@ -119,6 +131,18 @@
         },
         "data_description": {
           "reset_time": "Tellere, sperre, pause og varsel tilbakestilles daglig på dette tidspunktet."
+        }
+      },
+      "access": {
+        "title": "Tilgang",
+        "description": "Hvem kan endre medietiden til denne personen (forlenge, ekstra minutter, pause, sperre, tilbakestille)? Administratorer og automatiseringer har alltid lov.",
+        "data": {
+          "restrict_changes": "Bare administratorer og valgte brukere kan endre",
+          "allowed_users": "Brukere som i tillegg har lov"
+        },
+        "data_description": {
+          "restrict_changes": "Når på, avvises alle andre brukere (f.eks. kontoen til et nettbrett på veggen) – også via API-et. Av: alle kan endre, som før.",
+          "allowed_users": "Brukere uten administratorrettigheter som likevel kan endre denne personen. Ignoreres så lenge begrensningen er av."
         }
       }
     },

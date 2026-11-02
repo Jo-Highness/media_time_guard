@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from . import MediaTimeGuardConfigEntry
 from .const import (
+    CONF_ALLOWED_USERS,
     CONF_NAME,
     CONF_PERSON_ENTITY,
     CONF_PLAYERS,
@@ -20,6 +21,7 @@ from .const import (
 # Names of children, entity ids (which often contain names or rooms), the
 # announcement text and media URLs are personal - never include them.
 TO_REDACT = {
+    CONF_ALLOWED_USERS,
     CONF_NAME,
     CONF_PERSON_ENTITY,
     CONF_PLAYERS,
