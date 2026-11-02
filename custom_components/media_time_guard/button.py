@@ -37,4 +37,4 @@ class ExtendButton(MediaTimeGuardEntity, ButtonEntity):
         self._attr_translation_placeholders = {"minutes": str(minutes)}
 
     async def async_press(self) -> None:
-        await self.coordinator.async_extend_time(self._minutes)
+        await self.coordinator.async_extend_time(self._minutes, context=self._action_context())

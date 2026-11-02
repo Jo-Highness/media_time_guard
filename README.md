@@ -80,7 +80,7 @@ Requires **Home Assistant 2025.2** or newer.
 
 ## Configuration
 
-Add one entry **per child**. Setup and later changes (**Configure** on the entry) use the same four steps:
+Add one entry **per child**. Setup and later changes (**Configure** on the entry) use the same five steps:
 
 | Step | What you set |
 |---|---|
@@ -88,9 +88,28 @@ Add one entry **per child**. Setup and later changes (**Configure** on the entry
 | **2 · Daily budgets** | Minutes for each weekday **Mon–Sun**. `0` blocks media for the whole day. |
 | **3 · Warning** | On/off, the **remaining-minutes threshold** (default `10`) and the **method**: a **TTS** announcement (TTS engine + text, `{minutes}` is replaced; leave the text empty for the default in your Home Assistant language) **or** a **media** content ID (+ content type, default `music`). |
 | **4 · Reset** | The daily **reset time** (default `00:00:00`). Counters, lock, suspension and warning are reset then. |
+| **5 · Access** | *Only admins and selected users may change* (default **off**) and optional **additionally allowed users** (non-admins). See [Who may change it](#who-may-change-it). |
 
 Optional fields (TTS engine, text, media ID/type) can be cleared again in the options.
 Raising a budget in the options lifts an active lock right away if time is left.
+
+### Who may change it
+
+Home Assistant has no per-entity permissions – hiding cards on a dashboard does not stop a logged-in
+user from pressing *+15 min* through another dashboard, Assist or the API. With **Access → Only admins and
+selected users may change** turned on, Media Time Guard checks **every change itself** (extend, extra
+minutes, suspend, block/unblock, reset):
+
+| Caller | Allowed? |
+|---|---|
+| Home Assistant **admins** | always |
+| Users in **Additionally allowed users** | yes |
+| **Automations**, schedules, the system (no user) | yes |
+| Any other user, e.g. a wall tablet's account | **no** – refused with *Unauthorized*, nothing changes, a warning is logged |
+
+The remaining time stays readable for everyone. Residual risks: automations run without a user, so don't
+build an automation a child can trigger (via a helper, a button, `automation.trigger`) that extends time,
+and don't expose the entities to voice satellites or HomeKit (they call without a user, too).
 
 ## Entities
 

@@ -18,7 +18,7 @@ kopieren und HA neu starten.
 ## 2. Eine Person einrichten
 
 *Einstellungen → Geräte & Dienste → Integration hinzufügen → „Media Time Guard“.*
-Pro Person wird ein eigener Eintrag angelegt. Der Assistent hat vier Schritte:
+Pro Person wird ein eigener Eintrag angelegt. Der Assistent hat fünf Schritte:
 
 1. **Person & Player**
    - **Name**: z. B. `Luke` (muss eindeutig sein).
@@ -28,6 +28,7 @@ Pro Person wird ein eigener Eintrag angelegt. Der Assistent hat vier Schritte:
    - **TTS**: TTS-Engine wählen + Ansagetext. `{minutes}` wird durch die Restminuten ersetzt.
    - **Medien**: eine Medien-URL / Content-ID, die abgespielt wird.
 4. **Reset**: Uhrzeit, zu der jeden Tag neu gezählt wird (Standard `00:00`).
+5. **Zugriff**: *Nur Administratoren und ausgewählte Benutzer dürfen ändern* (Standard aus) und optional zusätzlich erlaubte Benutzer ohne Adminrechte.
 
 Später ändern: Eintrag → **Konfigurieren**.
 
@@ -67,3 +68,15 @@ Der Sensor liefert u. a. die Attribute `budget_minutes`, `used_minutes`, `remain
 
 Gezählt wird der Zustand `playing`. **Stummes oder sehr leises Abspielen zählt trotzdem**,
 weil der Player weiterhin „spielt“.
+
+## 7. Wer darf ändern?
+
+Ist im Schritt **Zugriff** die Beschränkung eingeschaltet, dürfen nur noch **Administratoren**, die
+**ausgewählten Benutzer** und **Automationen** die Medienzeit dieser Person ändern (verlängern,
+Extra-Minuten, heute aussetzen, sperren/entsperren, zurücksetzen). Alle anderen – z. B. das Konto eines
+Wandtablets, das die Kinder bedienen – bekommen „Unauthorized“, egal ob über Dashboard, Assist oder API.
+Die Restzeit bleibt für alle sichtbar.
+
+Wichtig: Automationen laufen ohne Benutzer und dürfen deshalb immer. Bau keine Automation, die ein Kind
+auslösen kann (z. B. über einen Helfer oder Taster) und die dann Zeit verlängert. Gib die Entitäten nicht
+für Sprachsatelliten oder HomeKit frei.

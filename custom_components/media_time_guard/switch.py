@@ -41,10 +41,10 @@ class SuspendTodaySwitch(MediaTimeGuardEntity, SwitchEntity):
         return bool(data.get(ATTR_IS_SUSPENDED, False))
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        await self.coordinator.async_set_suspended(True)
+        await self.coordinator.async_set_suspended(True, context=self._action_context())
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        await self.coordinator.async_set_suspended(False)
+        await self.coordinator.async_set_suspended(False, context=self._action_context())
 
 
 class BlockedSwitch(MediaTimeGuardEntity, SwitchEntity):
@@ -61,7 +61,7 @@ class BlockedSwitch(MediaTimeGuardEntity, SwitchEntity):
         return bool(data.get(ATTR_IS_BLOCKED, False))
 
     async def async_turn_on(self, **kwargs: Any) -> None:
-        await self.coordinator.async_set_blocked(True)
+        await self.coordinator.async_set_blocked(True, context=self._action_context())
 
     async def async_turn_off(self, **kwargs: Any) -> None:
-        await self.coordinator.async_set_blocked(False)
+        await self.coordinator.async_set_blocked(False, context=self._action_context())

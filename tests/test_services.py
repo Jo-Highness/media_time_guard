@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from homeassistant.core import Context
 from homeassistant.exceptions import ServiceValidationError
 import pytest
 from pytest_homeassistant_custom_component.common import async_mock_service
@@ -45,8 +46,8 @@ async def test_reset_person_service(hass):
     """reset_person clears extra minutes, suspension and lock."""
     entry = await setup_person(hass, name="Luke")
     guard = entry.runtime_data
-    await guard.async_extend_time(20)
-    await guard.async_set_suspended(True)
+    await guard.async_extend_time(20, context=Context())
+    await guard.async_set_suspended(True, context=Context())
 
     await hass.services.async_call(DOMAIN, SERVICE_RESET_PERSON, {"person": "Luke"}, blocking=True)
     assert guard.data["extra_minutes_today"] == 0

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from freezegun import freeze_time
+from homeassistant.core import Context
 from homeassistant.exceptions import HomeAssistantError
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
@@ -123,7 +124,7 @@ async def test_extend_unlocks(hass, make_guard):
         await guard.async_refresh()
         assert guard.data["is_locked"] is True
 
-        await guard.async_extend_time(10)
+        await guard.async_extend_time(10, context=Context())
         assert guard.data["is_locked"] is False
         assert guard.data["extra_minutes_today"] == 10
         assert guard.data["remaining_minutes"] > 0
@@ -134,7 +135,7 @@ async def test_suspend_does_not_enforce(hass, make_guard):
     stop_calls = async_mock_service(hass, "media_player", "media_stop")
     with freeze_time("2026-05-29 10:00:00") as frozen:
         guard = await make_guard(budget_minutes=1)
-        await guard.async_set_suspended(True)
+        await guard.async_set_suspended(True, context=Context())
 
         hass.states.async_set(PLAYER, "playing")
         await guard.async_refresh()
@@ -303,7 +304,7 @@ async def test_lock_kept_when_budget_still_exhausted(hass, make_guard):
         hass.states.async_set(PLAYER, "idle")
         await guard.async_refresh()
         assert guard.data["is_locked"] is True
-        await guard.async_set_extra_minutes(0)
+        await guard.async_set_extra_minutes(0, context=Context())
         assert guard.data["is_locked"] is True
 
 
@@ -319,7 +320,7 @@ async def test_warning_rearmed_after_extension(hass, make_guard):
         await hass.async_block_till_done(wait_background_tasks=True)
         assert len(tts_calls) == 1
 
-        await guard.async_extend_time(15)  # 19.5 min left -> re-armed
+        await guard.async_extend_time(15, context=Context())  # 19.5 min left -> re-armed
         assert guard.data["warned_today"] is False
 
         frozen.move_to("2026-05-29 10:20:30")  # 4.5 min left again
@@ -338,7 +339,7 @@ async def test_small_extension_does_not_rearm(hass, make_guard):
         await guard.async_refresh()
         frozen.move_to("2026-05-29 10:07:00")  # 3 min left
         await guard.async_refresh()
-        await guard.async_extend_time(1)  # 4 min left, still below 5
+        await guard.async_extend_time(1, context=Context())  # 4 min left, still below 5
         await hass.async_block_till_done(wait_background_tasks=True)
         assert guard.data["warned_today"] is True
         assert len(tts_calls) == 1

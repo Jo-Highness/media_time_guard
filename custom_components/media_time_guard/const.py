@@ -23,6 +23,11 @@ CONF_TTS_MESSAGE = "tts_message"
 CONF_WARNING_MEDIA_ID = "warning_media_id"
 CONF_WARNING_MEDIA_TYPE = "warning_media_type"
 
+# Access control (1.4.0): when enabled, only admins, the listed non-admin
+# users and calls without a user (automations, system) may change a person.
+CONF_RESTRICT_CHANGES = "restrict_changes"
+CONF_ALLOWED_USERS = "allowed_users"  # list of Home Assistant user ids
+
 WARNING_METHOD_TTS = "tts"
 WARNING_METHOD_MEDIA = "media"
 WARNING_METHODS = [WARNING_METHOD_TTS, WARNING_METHOD_MEDIA]
@@ -79,6 +84,13 @@ ATTR_CONFIG_ENTRY_ID = "config_entry_id"
 ATTR_MINUTES = "minutes"
 ATTR_SUSPENDED = "suspended"
 ATTR_BLOCKED = "blocked"
+
+# Names of the guarded actions (logged on refusal, ``Unauthorized.permission``).
+ACTION_EXTEND_TIME = "extend_time"
+ACTION_SET_EXTRA_MINUTES = "set_extra_minutes"
+ACTION_SET_SUSPENDED = "suspend_today"
+ACTION_SET_BLOCKED = "set_blocked"
+ACTION_RESET_PERSON = "reset_person"
 
 # --- Dispatcher ------------------------------------------------------------
 SIGNAL_UPDATE = f"{DOMAIN}_update"

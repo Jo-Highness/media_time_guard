@@ -18,7 +18,7 @@ players counts; other devices and apps are not covered.
 ## 2. Set up a person
 
 *Settings → Devices & Services → Add integration → "Media Time Guard".*
-One entry is created per person. The wizard has four steps:
+One entry is created per person. The wizard has five steps:
 
 1. **Person & players**
    - **Name**: e.g. `Luke` (must be unique).
@@ -28,6 +28,7 @@ One entry is created per person. The wizard has four steps:
    - **TTS**: pick a TTS engine + announcement text. `{minutes}` is replaced by the minutes left.
    - **Media**: a media URL / content ID to play.
 4. **Reset**: time of day the counter resets (default `00:00`).
+5. **Access**: *Only admins and selected users may change* (default off) and optionally additionally allowed non-admin users.
 
 Change later via the entry's **Configure** button.
 
@@ -67,3 +68,14 @@ Sensor attributes include `budget_minutes`, `used_minutes`, `remaining_minutes`,
 
 Counting is based on the `playing` state. **Muted or very quiet playback still counts**,
 because the player is still "playing".
+
+## 7. Who may change it?
+
+With the restriction switched on in the **Access** step, only **admins**, the **selected users** and
+**automations** may change this person's media time (extend, extra minutes, suspend today,
+block/unblock, reset). Everyone else – e.g. the account of a wall tablet the kids use – gets
+"Unauthorized", whether via dashboard, Assist or API. The remaining time stays visible to everyone.
+
+Important: automations run without a user and are therefore always allowed. Don't build an automation
+a child can trigger (e.g. via a helper or button) that then extends time. Don't expose the entities to
+voice satellites or HomeKit.

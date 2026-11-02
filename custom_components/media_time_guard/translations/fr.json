@@ -53,6 +53,18 @@
         "data_description": {
           "reset_time": "Compteurs, verrouillage, suspension et avertissement sont réinitialisés chaque jour à cette heure."
         }
+      },
+      "access": {
+        "title": "Accès",
+        "description": "Qui peut modifier le temps multimédia de cette personne (prolonger, minutes supplémentaires, suspendre, bloquer, réinitialiser) ? Les administrateurs et les automatisations le peuvent toujours.",
+        "data": {
+          "restrict_changes": "Seuls les administrateurs et les utilisateurs choisis peuvent modifier",
+          "allowed_users": "Utilisateurs autorisés en plus"
+        },
+        "data_description": {
+          "restrict_changes": "Activé : tous les autres utilisateurs (p. ex. le compte d'une tablette murale) sont refusés, y compris via l'API. Désactivé : tout le monde peut modifier, comme avant.",
+          "allowed_users": "Utilisateurs non administrateurs qui peuvent quand même modifier cette personne. Ignoré tant que la restriction est désactivée."
+        }
       }
     },
     "error": {
@@ -119,6 +131,18 @@
         },
         "data_description": {
           "reset_time": "Compteurs, verrouillage, suspension et avertissement sont réinitialisés chaque jour à cette heure."
+        }
+      },
+      "access": {
+        "title": "Accès",
+        "description": "Qui peut modifier le temps multimédia de cette personne (prolonger, minutes supplémentaires, suspendre, bloquer, réinitialiser) ? Les administrateurs et les automatisations le peuvent toujours.",
+        "data": {
+          "restrict_changes": "Seuls les administrateurs et les utilisateurs choisis peuvent modifier",
+          "allowed_users": "Utilisateurs autorisés en plus"
+        },
+        "data_description": {
+          "restrict_changes": "Activé : tous les autres utilisateurs (p. ex. le compte d'une tablette murale) sont refusés, y compris via l'API. Désactivé : tout le monde peut modifier, comme avant.",
+          "allowed_users": "Utilisateurs non administrateurs qui peuvent quand même modifier cette personne. Ignoré tant que la restriction est désactivée."
         }
       }
     },

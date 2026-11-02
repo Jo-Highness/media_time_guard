@@ -150,7 +150,27 @@ logged. Event/reset refreshes are entry tasks, so they are cancelled on unload. 
 - A non-fixable repair issue `missing_entities_<entry_id>` is created when an assigned player or
   (with TTS warnings enabled) the TTS entity has neither a state nor a registry entry. Checked
   after HA has started and on every poll; it clears itself.
-- `diagnostics.py` redacts names, entity IDs, texts and media IDs.
+- `diagnostics.py` redacts names, entity IDs, texts and media IDs, and the allowed user ids.
+
+## 8b. Access control (1.4.0, ADR f1d19c22)
+
+- Options `restrict_changes` (bool, default `False`) and `allowed_users` (list of HA user ids),
+  edited in the flow step `access`. Missing keys (entries from ≤ 1.3) read as "not restricted".
+- The five public write actions of `PersonGuard` (`async_extend_time`, `async_set_extra_minutes`,
+  `async_set_suspended`, `async_set_blocked`, `async_reset_person`) take a **mandatory
+  keyword-only `context`**. Their first statement is `_async_check_permission(context, action)`,
+  before the lock and before `_tick`, so a refused call has no side effect and a new caller that
+  forgets the context fails with `TypeError` instead of silently bypassing the check.
+- Rule (only when `restrict_changes`): `context.user_id is None` → allowed (automations, system);
+  active user that `is_admin` or is in `allowed_users` → allowed; everything else (unknown,
+  deleted, deactivated, other users) → `Unauthorized(context, user_id, config_entry_id,
+  permission=<action>)` plus a `WARNING` log line.
+- Services pass `call.context`. Entities pass `MediaTimeGuardEntity._action_context()`, which
+  reads `self._context` (set by HA's `entity_service_call` via `async_set_context` right before
+  the method runs) synchronously before the first `await` – with `PARALLEL_UPDATES = 0` a
+  concurrent call could otherwise overwrite it. No context → `Unauthorized` (fail closed).
+- The access form lists only active, non-system, non-admin users; stored ids that are no longer
+  selectable are dropped from the default so the form never fails validation.
 
 ## 9. Validation
 

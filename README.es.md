@@ -80,7 +80,7 @@ Requiere **Home Assistant 2025.2** o posterior.
 
 ## Configuración
 
-Una entrada **por niño**. La configuración y los cambios posteriores (**Configurar** en la entrada) usan los mismos cuatro pasos:
+Una entrada **por niño**. La configuración y los cambios posteriores (**Configurar** en la entrada) usan los mismos cinco pasos:
 
 | Paso | Qué configuras |
 |---|---|
@@ -88,9 +88,29 @@ Una entrada **por niño**. La configuración y los cambios posteriores (**Config
 | **2 · Presupuestos diarios** | Minutos para cada día **lun–dom**. `0` bloquea la multimedia todo el día. |
 | **3 · Aviso** | Activar/desactivar, el **umbral de minutos restantes** (por defecto `10`) y el **método**: un anuncio **TTS** (motor TTS + texto, `{minutes}` se sustituye; deja el texto vacío para usar el texto predeterminado en el idioma de Home Assistant) **o** un ID de contenido **multimedia** (+ tipo de contenido, por defecto `music`). |
 | **4 · Reinicio** | La **hora de reinicio** diaria (por defecto `00:00:00`). Entonces se reinician contadores, bloqueo, suspensión y aviso. |
+| **5 · Acceso** | *Solo administradores y usuarios seleccionados pueden cambiar* (desactivado por **defecto**) y, opcionalmente, **usuarios permitidos adicionalmente** (sin derechos de administrador). Ver [¿Quién puede cambiarlo?](#quién-puede-cambiarlo). |
 
 Los campos opcionales (motor TTS, texto, ID/tipo multimedia) se pueden vaciar de nuevo en las opciones.
 Si aumentas un presupuesto en las opciones, un bloqueo activo se levanta en seguida si queda tiempo.
+
+### ¿Quién puede cambiarlo?
+
+Home Assistant no tiene permisos por entidad: ocultar tarjetas en un panel no impide que un usuario con
+sesión iniciada pulse *+15 min* desde otro panel, Assist o la API. Con **Acceso → Solo administradores y
+usuarios seleccionados pueden cambiar** activado, Media Time Guard comprueba **cada cambio por sí mismo**
+(ampliar, minutos extra, suspender, bloquear/desbloquear, reiniciar):
+
+| Quién llama | ¿Permitido? |
+|---|---|
+| **Administradores** de Home Assistant | siempre |
+| Usuarios en **Usuarios permitidos adicionalmente** | sí |
+| **Automatizaciones**, horarios, el sistema (sin usuario) | sí |
+| Cualquier otro usuario, p. ej. la cuenta de una tableta de pared | **no**: se rechaza con *Unauthorized*, nada cambia, se registra un aviso |
+
+El tiempo restante sigue visible para todos. Riesgos residuales: las automatizaciones se ejecutan sin
+usuario, así que no crees una automatización que un niño pueda activar (ayudante, pulsador,
+`automation.trigger`) y que amplíe el tiempo, y no expongas las entidades a satélites de voz ni a HomeKit
+(también llaman sin usuario).
 
 ## Entidades
 

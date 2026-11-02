@@ -53,6 +53,18 @@
         "data_description": {
           "reset_time": "Zähler, Sperre, Aussetzen und Warnung werden täglich zu dieser Uhrzeit zurückgesetzt."
         }
+      },
+      "access": {
+        "title": "Zugriff",
+        "description": "Wer darf die Medienzeit dieser Person ändern (verlängern, Extra-Minuten, heute aussetzen, sperren, zurücksetzen)? Administratoren und Automationen dürfen immer.",
+        "data": {
+          "restrict_changes": "Nur Administratoren und ausgewählte Benutzer dürfen ändern",
+          "allowed_users": "Zusätzlich erlaubte Benutzer"
+        },
+        "data_description": {
+          "restrict_changes": "Wenn an, werden alle anderen Benutzer (z. B. das Konto eines Wandtablets) abgewiesen – auch über die API. Aus: alle dürfen ändern, wie bisher.",
+          "allowed_users": "Benutzer ohne Adminrechte, die diese Person trotzdem ändern dürfen. Wird ignoriert, solange die Beschränkung aus ist."
+        }
       }
     },
     "error": {
@@ -119,6 +131,18 @@
         },
         "data_description": {
           "reset_time": "Zähler, Sperre, Aussetzen und Warnung werden täglich zu dieser Uhrzeit zurückgesetzt."
+        }
+      },
+      "access": {
+        "title": "Zugriff",
+        "description": "Wer darf die Medienzeit dieser Person ändern (verlängern, Extra-Minuten, heute aussetzen, sperren, zurücksetzen)? Administratoren und Automationen dürfen immer.",
+        "data": {
+          "restrict_changes": "Nur Administratoren und ausgewählte Benutzer dürfen ändern",
+          "allowed_users": "Zusätzlich erlaubte Benutzer"
+        },
+        "data_description": {
+          "restrict_changes": "Wenn an, werden alle anderen Benutzer (z. B. das Konto eines Wandtablets) abgewiesen – auch über die API. Aus: alle dürfen ändern, wie bisher.",
+          "allowed_users": "Benutzer ohne Adminrechte, die diese Person trotzdem ändern dürfen. Wird ignoriert, solange die Beschränkung aus ist."
         }
       }
     },

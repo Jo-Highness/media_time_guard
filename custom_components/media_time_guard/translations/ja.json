@@ -53,6 +53,18 @@
         "data_description": {
           "reset_time": "カウンター、ロック、一時停止、警告は毎日この時刻にリセットされます。"
         }
+      },
+      "access": {
+        "title": "アクセス",
+        "description": "この人のメディア時間（延長、追加時間、今日は一時停止、ブロック、リセット）を変更できるのは誰ですか？管理者とオートメーションは常に許可されます。",
+        "data": {
+          "restrict_changes": "管理者と選択したユーザーのみ変更可能",
+          "allowed_users": "追加で許可するユーザー"
+        },
+        "data_description": {
+          "restrict_changes": "オンにすると、その他のユーザー（例：壁掛けタブレットのアカウント）はAPI経由でも拒否されます。オフ：従来どおり誰でも変更できます。",
+          "allowed_users": "管理者ではないが、この人を変更できるユーザー。制限がオフの間は無視されます。"
+        }
       }
     },
     "error": {
@@ -119,6 +131,18 @@
         },
         "data_description": {
           "reset_time": "カウンター、ロック、一時停止、警告は毎日この時刻にリセットされます。"
+        }
+      },
+      "access": {
+        "title": "アクセス",
+        "description": "この人のメディア時間（延長、追加時間、今日は一時停止、ブロック、リセット）を変更できるのは誰ですか？管理者とオートメーションは常に許可されます。",
+        "data": {
+          "restrict_changes": "管理者と選択したユーザーのみ変更可能",
+          "allowed_users": "追加で許可するユーザー"
+        },
+        "data_description": {
+          "restrict_changes": "オンにすると、その他のユーザー（例：壁掛けタブレットのアカウント）はAPI経由でも拒否されます。オフ：従来どおり誰でも変更できます。",
+          "allowed_users": "管理者ではないが、この人を変更できるユーザー。制限がオフの間は無視されます。"
         }
       }
     },
@@ -189,7 +213,7 @@
           "description": "その人物の Media Time Guard エントリー。名前を変更しても有効です。"
         },
         "blocked": {
-          "name": "Blocked",
+          "name": "ブロック中",
           "description": "True blocks all players of the person, false lifts the block."
         }
       }

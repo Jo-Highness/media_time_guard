@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from homeassistant.core import Context
+from homeassistant.exceptions import Unauthorized
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -33,3 +35,16 @@ class MediaTimeGuardEntity(CoordinatorEntity[PersonGuard]):
             model="Per-person media time budget",
             entry_type=DeviceEntryType.SERVICE,
         )
+
+    def _action_context(self) -> Context:
+        """Return the context of the service call that triggered this action.
+
+        Home Assistant sets it via ``async_set_context`` right before calling
+        the entity method. It must be read before the first ``await``
+        (``PARALLEL_UPDATES = 0`` lets calls for this entity interleave).
+        Without a context the caller is unknown -> refuse (fail closed).
+        """
+        context = self._context
+        if context is None:
+            raise Unauthorized(config_entry_id=self.coordinator.entry.entry_id)
+        return context
