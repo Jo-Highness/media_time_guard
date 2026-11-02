@@ -81,7 +81,7 @@ Voraussetzung: **Home Assistant 2025.2** oder neuer.
 
 ## Einrichtung
 
-Ein Eintrag **pro Kind**. Einrichtung und spätere Änderungen (**Konfigurieren** am Eintrag) nutzen dieselben vier Schritte:
+Ein Eintrag **pro Kind**. Einrichtung und spätere Änderungen (**Konfigurieren** am Eintrag) nutzen dieselben fünf Schritte:
 
 | Schritt | Was du einstellst |
 |---|---|
@@ -89,9 +89,28 @@ Ein Eintrag **pro Kind**. Einrichtung und spätere Änderungen (**Konfigurieren*
 | **2 · Tagesbudgets** | Minuten je Wochentag **Mo–So**. `0` sperrt Medien den ganzen Tag. |
 | **3 · Vorwarnung** | Ein/aus, **Restzeit-Schwelle** (Standard `10`) und die **Methode**: eine **TTS**-Ansage (TTS-Engine + Text, `{minutes}` wird ersetzt; Text leer lassen für den Standardtext in deiner Home-Assistant-Sprache) **oder** eine **Medien**-Content-ID (+ Content-Typ, Standard `music`). |
 | **4 · Reset** | Uhrzeit des täglichen **Resets** (Standard `00:00:00`). Dann werden Zähler, Sperre, Aussetzen und Vorwarnung zurückgesetzt. |
+| **5 · Zugriff** | *Nur Administratoren und ausgewählte Benutzer dürfen ändern* (Standard **aus**) und optional **zusätzlich erlaubte Benutzer** (ohne Adminrechte). Siehe [Wer darf ändern?](#wer-darf-ändern). |
 
 Optionale Felder (TTS-Engine, Text, Medien-ID/-Typ) lassen sich in den Optionen auch wieder leeren.
 Wird ein Budget in den Optionen erhöht, wird eine aktive Sperre sofort aufgehoben, sofern wieder Zeit übrig ist.
+
+### Wer darf ändern?
+
+Home Assistant kennt keine Rechte pro Entität. Karten im Dashboard auszublenden hindert einen angemeldeten
+Benutzer nicht daran, *+15 min* über ein anderes Dashboard, Assist oder die API zu drücken. Mit
+**Zugriff → Nur Administratoren und ausgewählte Benutzer dürfen ändern** prüft Media Time Guard **jede
+Änderung selbst** (verlängern, Extra-Minuten, heute frei, sperren/entsperren, zurücksetzen):
+
+| Aufrufer | Erlaubt? |
+|---|---|
+| Home-Assistant-**Administratoren** | immer |
+| Benutzer unter **Zusätzlich erlaubte Benutzer** | ja |
+| **Automationen**, Zeitpläne, das System (ohne Benutzer) | ja |
+| Jeder andere Benutzer, z. B. das Konto eines Wandtablets | **nein** – Abweisung mit *Unauthorized*, nichts ändert sich, Warnung im Log |
+
+Die Restzeit bleibt für alle lesbar. Restrisiken: Automationen laufen ohne Benutzer. Bau also keine
+Automation, die ein Kind auslösen kann (Helfer, Taster, `automation.trigger`) und die Zeit verlängert,
+und gib die Entitäten nicht für Sprachsatelliten oder HomeKit frei (die rufen ebenfalls ohne Benutzer auf).
 
 ## Entitäten
 

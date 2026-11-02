@@ -18,7 +18,7 @@ los reproductores asignados; otros dispositivos y apps no quedan cubiertos.
 ## 2. Configurar una persona
 
 *Ajustes → Dispositivos y servicios → Añadir integración → "Media Time Guard".*
-Se crea una entrada por persona. El asistente tiene cuatro pasos:
+Se crea una entrada por persona. El asistente tiene cinco pasos:
 
 1. **Persona y reproductores**
    - **Nombre**: p. ej. `Luke` (debe ser único).
@@ -28,6 +28,7 @@ Se crea una entrada por persona. El asistente tiene cuatro pasos:
    - **TTS**: elige un motor TTS + texto del anuncio. `{minutes}` se reemplaza por los minutos restantes.
    - **Multimedia**: una URL / ID de contenido para reproducir.
 4. **Reinicio**: hora a la que se reinicia el contador (por defecto `00:00`).
+5. **Acceso**: *Solo administradores y usuarios seleccionados pueden cambiar* (desactivado por defecto) y, opcionalmente, usuarios sin derechos de administrador permitidos adicionalmente.
 
 Cámbialo más tarde con el botón **Configurar** de la entrada.
 
@@ -67,3 +68,15 @@ Atributos del sensor: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is
 
 El recuento se basa en el estado `playing`. **La reproducción silenciada o muy baja también
 cuenta**, porque el reproductor sigue "reproduciendo".
+
+## 7. ¿Quién puede cambiarlo?
+
+Con la restricción activada en el paso **Acceso**, solo los **administradores**, los **usuarios
+seleccionados** y las **automatizaciones** pueden cambiar el tiempo multimedia de esta persona (ampliar,
+minutos extra, suspender hoy, bloquear/desbloquear, reiniciar). Los demás – p. ej. la cuenta de una tableta
+de pared que usan los niños – reciben "Unauthorized", ya sea desde el panel, Assist o la API. El tiempo
+restante sigue visible para todos.
+
+Importante: las automatizaciones se ejecutan sin usuario y por eso siempre están permitidas. No crees una
+automatización que un niño pueda activar (p. ej. con un ayudante o un pulsador) y que amplíe el tiempo. No
+expongas las entidades a satélites de voz ni a HomeKit.

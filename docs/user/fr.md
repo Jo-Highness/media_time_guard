@@ -18,7 +18,7 @@ attribués est compté ; les autres appareils et applications ne sont pas couver
 ## 2. Configurer une personne
 
 *Paramètres → Appareils et services → Ajouter une intégration → « Media Time Guard ».*
-Une entrée est créée par personne. L'assistant comporte quatre étapes :
+Une entrée est créée par personne. L'assistant comporte cinq étapes :
 
 1. **Personne et lecteurs**
    - **Nom** : par ex. `Luke` (doit être unique).
@@ -28,6 +28,7 @@ Une entrée est créée par personne. L'assistant comporte quatre étapes :
    - **TTS** : choisissez un moteur TTS + texte d'annonce. `{minutes}` est remplacé par les minutes restantes.
    - **Multimédia** : une URL / un ID de contenu à lire.
 4. **Réinitialisation** : heure à laquelle le compteur est remis à zéro (par défaut `00:00`).
+5. **Accès** : *Seuls les administrateurs et les utilisateurs choisis peuvent modifier* (désactivé par défaut) et, en option, des utilisateurs non administrateurs autorisés en plus.
 
 Modifiez-le plus tard via le bouton **Configurer** de l'entrée.
 
@@ -67,3 +68,15 @@ Attributs du capteur : `budget_minutes`, `used_minutes`, `remaining_minutes`, `i
 
 Le comptage repose sur l'état `playing`. **La lecture en sourdine ou très basse compte quand
 même**, car le lecteur « lit » toujours.
+
+## 7. Qui peut modifier ?
+
+Si la restriction est activée à l'étape **Accès**, seuls les **administrateurs**, les **utilisateurs
+choisis** et les **automatisations** peuvent modifier le temps multimédia de cette personne (prolonger,
+minutes supplémentaires, suspendre aujourd'hui, bloquer/débloquer, réinitialiser). Tous les autres – p. ex.
+le compte d'une tablette murale utilisée par les enfants – reçoivent « Unauthorized », que ce soit via le
+tableau de bord, Assist ou l'API. Le temps restant reste visible pour tous.
+
+Important : les automatisations s'exécutent sans utilisateur et sont donc toujours autorisées. Ne crée pas
+d'automatisation qu'un enfant peut déclencher (p. ex. via un assistant ou un bouton) et qui prolonge le
+temps. N'expose pas les entités aux satellites vocaux ni à HomeKit.

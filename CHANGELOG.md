@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-02
+
+> **Upgrade notes:** nothing changes until you turn the new option on. Open each person's
+> **Configure** dialog and enable **Access → Only admins and selected users may change**.
+
+### Added
+
+- **Access control per person:** new options step **Access** with *Only admins and selected users
+  may change* (`restrict_changes`, default off) and *Additionally allowed users* (`allowed_users`,
+  non-admin Home Assistant users). When on, every change – the +15/+30 buttons, the extra-minutes
+  number, both switches (on and off) and the actions `extend_time`, `suspend_today`, `set_blocked`,
+  `reset_person` – is checked server-side. Admins, the allowed users and calls without a user
+  (automations, schedules) may change; everyone else (e.g. a wall tablet's account) gets
+  `Unauthorized`, nothing changes and a warning is logged. Unknown or deactivated users are refused.
+- Diagnostics redact the allowed user ids.
+
+### Security
+
+- Dashboards can only hide controls; the new check also blocks other dashboards, Assist, scripts
+  and direct API calls. Known gaps (automations a restricted user can trigger, voice satellites,
+  HomeKit) are documented in the README.
+
 ## [1.3.0] - 2026-10-27
 
 ### Added

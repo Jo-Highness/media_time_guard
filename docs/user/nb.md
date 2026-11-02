@@ -18,7 +18,7 @@ spillerne telles; andre enheter og apper dekkes ikke.
 ## 2. Sette opp en person
 
 *Innstillinger → Enheter og tjenester → Legg til integrasjon → «Media Time Guard».*
-Det opprettes én oppføring per person. Veiviseren har fire trinn:
+Det opprettes én oppføring per person. Veiviseren har fem trinn:
 
 1. **Person og spillere**
    - **Navn**: f.eks. `Luke` (må være unikt).
@@ -28,6 +28,7 @@ Det opprettes én oppføring per person. Veiviseren har fire trinn:
    - **TTS**: velg en TTS-motor + annonseringstekst. `{minutes}` erstattes med gjenværende minutter.
    - **Media**: en medie-URL / innholds-ID som spilles av.
 4. **Nullstilling**: tidspunktet telleren nullstilles (standard `00:00`).
+5. **Tilgang**: *Bare administratorer og valgte brukere kan endre* (av som standard) og eventuelt brukere uten administratorrettigheter som i tillegg har lov.
 
 Endre senere via **Konfigurer**-knappen på oppføringen.
 
@@ -66,3 +67,14 @@ Sensorattributter: `budget_minutes`, `used_minutes`, `remaining_minutes`, `is_lo
 
 Tellingen er basert på tilstanden `playing`. **Dempet eller svært lav avspilling telles
 likevel**, fordi spilleren fortsatt «spiller».
+
+## 7. Hvem kan endre?
+
+Når begrensningen er slått på i trinnet **Tilgang**, kan bare **administratorer**, de **valgte brukerne**
+og **automatiseringer** endre medietiden til denne personen (forlenge, ekstra minutter, pause i dag,
+sperre/oppheve, tilbakestille). Alle andre – f.eks. kontoen til et nettbrett på veggen som barna bruker –
+får «Unauthorized», enten via dashbord, Assist eller API. Gjenværende tid er fortsatt synlig for alle.
+
+Viktig: automatiseringer kjører uten bruker og er derfor alltid tillatt. Ikke lag en automatisering som et
+barn kan utløse (f.eks. via en hjelper eller knapp) og som forlenger tiden. Ikke del entitetene med
+talesatellitter eller HomeKit.
